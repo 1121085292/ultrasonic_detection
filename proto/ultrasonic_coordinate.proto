@@ -1,0 +1,55 @@
+syntax = "proto2";
+
+package ultrasonic_detection.proto;
+//  车头前进方向为X轴正方向，Y轴正方向垂直向左
+//  angle为探头轴线与X轴正方向夹角
+message UltrasonicCoordinate {
+  // 左侧探头位置坐标
+  optional double FSL_x = 1 [default = 3273.9];
+  optional double FSL_y = 2 [default = 917.2];
+  optional double FSL_angle = 3 [default = 85];
+  optional double RSL_x = 4 [default = -383.4];
+  optional double RSL_y = 5 [default = 917.1];
+  optional double RSL_angle = 6 [default = 98.5];
+
+  // 前方四个探头位置坐标
+  optional double FCR_x = 7 [default = 3705];
+  optional double FCR_y = 8 [default = -362.9];
+  optional double FCR_angle = 9 [default = 9];
+  optional double FCL_x = 10 [default = 3705];
+  optional double FCL_y = 11 [default = 362.9];
+  optional double FCL_angle = 12 [default = 9];
+
+  optional double FOR_x = 13 [default = 3547.2];
+  optional double FOR_y = 14 [default = -716.1];
+  optional double FOR_angle = 15 [default = 38.5];
+  optional double FOL_x = 16 [default = 3547.2];
+  optional double FOL_y = 17 [default = 716.1];
+  optional double FOL_angle = 18 [default = 38.5];
+
+  // 后方四个探头位置坐标
+  optional double RCR_x = 19 [default = -931.1];
+  optional double RCR_y = 20 [default = -339.4];
+  optional double RCR_angle = 21 [default = 174.8];
+  optional double RCL_x = 22 [default = -931.1];
+  optional double RCL_y = 23 [default = 339.4];
+  optional double RCL_angle = 24 [default = 174.8];
+
+  optional double ROR_x = 25 [default = -776.1];
+  optional double ROR_y = 26 [default = -695.1];
+  optional double ROR_angle = 27 [default = 137.4];
+  optional double ROL_x = 28 [default = -776.1];
+  optional double ROL_y = 29 [default = 695.1];
+  optional double ROL_angle = 30 [default = 137.4];
+
+  // 右侧探头位置坐标
+  optional double FSR_x = 31 [default = 3273.9];
+  optional double FSR_y = 32 [default = -917.2];
+  optional double FSR_angle = 33 [default = 85];
+  optional double RSR_x = 34 [default = -383.4];
+  optional double RSR_y = 35 [default = -917.2];
+  optional double RSR_angle = 36 [default = 98.5];
+
+  //  三角测距
+  optional bool use_triangle_measured = 37 [default = false];
+}

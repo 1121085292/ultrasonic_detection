@@ -1,0 +1,17 @@
+module_config {
+  module_library : "../bazel-bin/ultrasonic_detection/libultrasonic_perception.so"
+
+  components {
+    class_name : "UltrasonicComponent"
+    config {
+      name: "UltrasonicComponent"
+      config_file_path :"../ultrasonic_detection/conf/ultrasonic_coordinate.pb.txt"
+      readers {
+        channel: "echo_list"
+      },
+      readers {
+        channel: "location"
+      }
+    }
+  }
+}

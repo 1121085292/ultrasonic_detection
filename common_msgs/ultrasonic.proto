@@ -1,0 +1,48 @@
+syntax = "proto2";
+
+package common_msgs.ultrasonic;
+
+import "ultrasonic_detection/common_msgs/error_code.proto";
+
+message Point {
+  optional double x = 1;
+  optional double y = 2;
+}
+enum Status {
+  Normal = 0;
+  BlindZone = 1;
+  OverDetection = 2;
+  Noise = 3;
+  InvalidPoint = 4;
+}
+
+message Ultrasonic {
+  //  探头位置
+  optional string orientation = 1;
+  //  障碍物点
+  optional Point position = 2;
+  //  全局坐标系下障碍物点
+  optional Point position_global = 3;
+  //  最近距离mm
+  optional uint32 distance = 4;
+  //  能量值
+  optional uint32 peak = 5;
+  //  波宽
+  optional uint32 width = 6;
+  //  置信度
+  optional uint32 confidence = 7;
+  //  检测状态
+  optional Status status = 8;
+  //  是否三角测距定位
+  optional bool use_triangle = 9;
+}
+
+//  distance detection algorithm output
+message UltrasonicList {
+  // 发布时间戳
+  optional uint32 timestamp = 1;
+  // 车辆12个探头输出的障碍物
+  repeated Ultrasonic ul_obj = 2;
+  //  错误码
+  optional common_msgs.error_code.ErrorCode error_code = 3;
+}
