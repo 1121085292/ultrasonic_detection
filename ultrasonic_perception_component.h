@@ -6,11 +6,10 @@
 #include "ultrasonic_detection/ultrasonic/ultrasonic_detection.h"
 #include "ultrasonic_detection/base/ultrasonic_orientation.h"
 
+using apollo::cyber::Component;
 using common_msgs::echo_list::Echo;
 using common_msgs::echo_list::EchoList;
 using common_msgs::ultrasonic::UltrasonicList;
-
-using apollo::cyber::Component;
 
 class UltrasonicComponent : public Component<EchoList, InsLocation>{
   public:
