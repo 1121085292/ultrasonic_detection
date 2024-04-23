@@ -103,8 +103,35 @@ bool UltrasonicComponent::Proc(
       }
     }
   }
+  // 空间车位识别
+  /*
+  * 使用FSL和FSR进行空间车位识别
+  * 存储20帧障碍物位置，数据滤波后进行线段拟合，通过横向和纵向距离进行阈值判断，识别潜在车位
+  */
+  std::queue<Point> fsl_pos;
+  std::queue<Point> fsr_pos;
+  // 存储当前帧障碍物位置
+  for(const auto& pair : global_pos_map){
+    if(pair.first == 0){
+      fsl_pos.push(pair.second);
+    }
+    if(pair.first == 5){
+      fsr_pos.push(pair.second);
+    }
+  }
+  // 当存储20帧后开始进行数据滤波，线段拟合
+  auto ul_fsl = std::make_shared<Ultrasonic>(coordinate_map_[0], global_pos_map[0]);
+  auto ul_fsr = std::make_shared<Ultrasonic>(coordinate_map_[5], global_pos_map[5]);
+  if(fsl_pos.size() == min_fit_num_){
+    ul
+    fsl_pos.pop();
+  }
+  if(fsr_pos.size() > 20){
+    fsr_pos.pop();
+  }
   // 组织数据
   auto ultrasonic_list = std::make_shared<UltrasonicList>();
+  // 测距定位信息
   FillUltraObject(pos_map, global_pos_map, ultrasonic_list);
   auto now = Clock::NowInSeconds();
   ultrasonic_list->set_timestamp(now);
@@ -114,7 +141,7 @@ bool UltrasonicComponent::Proc(
   } else {
     ultrasonic_list->set_error_code(common_msgs::error_code::ErrorCode::PERCEPTION_ERROR);
   }
-  // 空间车位识别
+
 
   ultrasonic_writer_->Write(ultrasonic_list);
   return true;

@@ -25,11 +25,21 @@ struct Point{
   }
 };
 
+struct LineFitInfo
+{
+  float angle;
+  float offset;
+  int valid_flag;
+  float variance;
+};
+
 class Ultrasonic {
   public:
     Ultrasonic(){}
     Ultrasonic(Point coordinate, int distance)
      : coordinate_(coordinate), meas_dis_(distance) {}
+    Ultrasonic(Point coordinate, Point point)
+     : coordinate_(coordinate), point_global_(point) {}
     ~Ultrasonic(){};
 
     // 获取探头测量距离
@@ -56,6 +66,8 @@ class Ultrasonic {
     // 全局坐标系下障碍物位置
     void GlobalDirectPositionCalculate(const std::shared_ptr<Pose>& pose);
 
+    // 数据滤波，线段拟合
+    void HoughFilter(const std::queue<Point>& points, LineFitInfo& line);
   private:
     // 探头安装位置
     Point coordinate_;
@@ -67,5 +79,6 @@ class Ultrasonic {
     Point point_global_;
 
     UltrasonicParams ultra_params_;
+    LineFitParams line_fit_params_;
     Status ultra_status_;
 };

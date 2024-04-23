@@ -16,3 +16,9 @@ struct Vehicle{
   int front_delta = 354;
   int rear_delta = 383;
 };
+
+struct LineFitParams
+{
+  int min_fit_num = 10;
+  float min_fit_distance = 0.6f;
+};

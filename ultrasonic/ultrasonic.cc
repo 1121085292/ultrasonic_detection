@@ -25,3 +25,8 @@ void Ultrasonic::GlobalDirectPositionCalculate(const std::shared_ptr<Pose>& pose
           + point_.x * sin(pose->heading()) + point_.y * cos(pose->heading());
   }
 }
+
+void Ultrasonic::HoughFilter(const std::queue<Point> &points, LineFitInfo &line){
+  if(points.size() )
+
+}
