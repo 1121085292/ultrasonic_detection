@@ -2,7 +2,7 @@
 
 void Ultrasonic::DirectMeasuredPositionCalculate(){
   if(meas_dis_ == ultra_params_.max_range){
-    point_ = Point(0.0, 0.0, 0.0);
+    point_ = Point2D(0.0, 0.0);
     SetStatus(Status::OverDetection);
   } else {
     point_.x = coordinate_.x + meas_dis_ * cos(coordinate_.angle);
@@ -24,9 +24,4 @@ void Ultrasonic::GlobalDirectPositionCalculate(const std::shared_ptr<Pose>& pose
     point_global_.y = pose.position().y()
           + point_.x * sin(pose->heading()) + point_.y * cos(pose->heading());
   }
-}
-
-void Ultrasonic::HoughFilter(const std::queue<Point> &points, LineFitInfo &line){
-  if(points.size() )
-
 }

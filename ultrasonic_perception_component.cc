@@ -59,12 +59,12 @@ bool UltrasonicComponent::Proc(
   }
 
   // 根据探头配置选择测距方式，实现探头定位
-  std::map<int, Point> pos_map;           //  车身坐标系下的障碍物位置
-  std::map<int, Point> global_pos_map;    //  全局坐标系下障碍物位置
+  std::map<int, Point2D> pos_map;           //  车身坐标系下的障碍物位置
+  std::map<int, Point2D> global_pos_map;    //  全局坐标系下障碍物位置
   auto pose = std::make_shared<Pose>(location->pose());
   for(int sensor_id = 0; sensor_id < 12; ++sensor_id){
-    Point position;
-    Point global_pos;
+    Point2D position;
+    Point2D global_pos;
     // 直接测距定位
     // 根据探头ID和测距信息创建探头对象，包含了侧探头
     auto ultra_ptr = std::make_shared<Ultrasonic>(coordinate_map_[sensor_id], dis_map[sensor_id][0]);
@@ -108,27 +108,23 @@ bool UltrasonicComponent::Proc(
   * 使用FSL和FSR进行空间车位识别
   * 存储20帧障碍物位置，数据滤波后进行线段拟合，通过横向和纵向距离进行阈值判断，识别潜在车位
   */
-  std::queue<Point> fsl_pos;
-  std::queue<Point> fsr_pos;
   // 存储当前帧障碍物位置
+  std::vector<Point2D>
   for(const auto& pair : global_pos_map){
     if(pair.first == 0){
-      fsl_pos.push(pair.second);
+      fsl_pos_.push(pair.second);
     }
     if(pair.first == 5){
-      fsr_pos.push(pair.second);
+      fsr_pos_.push(pair.second);
     }
   }
-  // 当存储20帧后开始进行数据滤波，线段拟合
+  // 当存储10帧后开始进行数据滤波，线段拟合
   auto ul_fsl = std::make_shared<Ultrasonic>(coordinate_map_[0], global_pos_map[0]);
   auto ul_fsr = std::make_shared<Ultrasonic>(coordinate_map_[5], global_pos_map[5]);
-  if(fsl_pos.size() == min_fit_num_){
-    ul
-    fsl_pos.pop();
-  }
-  if(fsr_pos.size() > 20){
-    fsr_pos.pop();
-  }
+  // 拟合线段
+  LineFitInfo line;
+  ul_fsl->HoughFilter(fsl_pos_, line);
+
   // 组织数据
   auto ultrasonic_list = std::make_shared<UltrasonicList>();
   // 测距定位信息

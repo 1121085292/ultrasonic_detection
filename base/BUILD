@@ -8,6 +8,11 @@ cc_library(
 )
 
 cc_library(
+  name = "point",
+  hdrs = ["point.h"],
+)
+
+cc_library(
   name = "ultrasonic_orientation",
   hdrs = ["ultrasonic_orientation.h"],
 )

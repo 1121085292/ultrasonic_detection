@@ -13,9 +13,9 @@ class UltrasonicDetection {
     ~UltrasonicDetection(){};
 
     // 获取障碍物位置
-    Point GetPosition() const { return point_; }
+    Point2D GetPosition() const { return point_; }
     // 获取全局坐标系下障碍物位置
-    Point GetGlobalPosition() const { return point_global_; }
+    Point2D GetGlobalPosition() const { return point_global_; }
     // 获取检测状态
     Status GetStatus() const { return ul_.GetStatus(); }
 
@@ -31,9 +31,7 @@ class UltrasonicDetection {
     Ultrasonic ul_;
     Ultrasonic ur_;
     // 障碍物位置
-    Point point_;
+    Point2D point_;
     // 全局坐标系下障碍物位置
-    Point point_global_;
-    UltrasonicParams ultra_params_;
-
+    Point2D point_global_;
 };

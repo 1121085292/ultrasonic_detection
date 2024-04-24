@@ -3,15 +3,15 @@
 void UltrasonicDetection::TriangleMeasuredPositionCalculate(){
   int ul_dis = ul_.GetMeasDistance();
   int ur_dis = ur_.GetMeasDistance();
-  Point ul_pos = ul_.GetUltraCoordinate();
-  Point ur_pos = ur_.GetUltraCoordinate();
+  Point3D ul_pos = ul_.GetUltraCoordinate();
+  Point3D ur_pos = ur_.GetUltraCoordinate();
   
-  if(ul_dis == ultra_params_.max_range ||
-     ur_dis == ultra_params_.max_range){
-    point_ = Point(0.0, 0.0, 0.0);
+  if(ul_dis == ul_.ultra_params_.max_range ||
+     ur_dis == ul_.ultra_params_.max_range){
+    point_ = Point2D(0.0, 0.0);
     ul_.SetStatus(Status::OverDetection);
   } else {
-    double bottom_edge = hypot((ul_pos - ur_pos).x, (ul_pos - ur_pos).y);
+    double bottom_edge = (ul_pos - ur_pos).Length();
     if((ul_dis + ur_dis > bottom_edge) && 
       fabs(ul_dis - ur_dis < bottom_edge)){
       // 计算α角
