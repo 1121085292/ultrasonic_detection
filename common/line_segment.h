@@ -24,4 +24,5 @@ class LineSegment {
     Cluster cluster_;
     Point2D p1_, p2_;
     LineFitParams line_fit_params_;
+    
 };
