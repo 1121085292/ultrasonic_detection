@@ -10,19 +10,28 @@ struct UltrasonicParams {
   int max_range = 6000;
 };
 
-struct Vehicle{
+struct Vehicle {
   int width = 1875;
   int wheel_base = 2920;
   int front_delta = 354;
   int rear_delta = 383;
 };
 
-struct LineFitParams
-{
+struct LineFitParams {
   int min_fit_num = 10;
-  float min_fit_distance = 0.6f;
   double merge_angle_threshold = 10 * M_PI / 180;
   double merge_dist_threshold = 0.05;
   double cluster_dist_threshold = 0.5;
   int min_cluster_size = 5;
+  double min_fit_distance = 0.6;
 };
+
+struct ParkingSpotParams{
+  double spot_width_threshold = 0.8;
+  double max_grow_length = 0.8;
+  double line_length_threshold = 2500.0;
+  double line_width_threshold = 800.0;
+  double line_dist = 0.5;
+  double line_angle = 10 * M_PI / 180;
+};
+

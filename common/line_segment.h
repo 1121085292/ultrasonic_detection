@@ -10,19 +10,25 @@ using Cluster = std::vector<Point2D>;
 class LineSegment {
   public:
     LineSegment(){}
-    LineSegment(const Point2D& p1, const Point2D& p2)
-      :  p1_(p1), p2_(p2) {}
+    LineSegment(const Point2D& start, const Point2D& end)
+      :  start_(start), end_(end) {}
     // 线的长度
     double Length() const {
-      return hypot((p2_ - p1_).x, (p2_ - p1_).y);
+      return (end_ - start_).Length();
     }
-    // 端点一
-    Point2D GetPoint1() const { return p1_; }
-    // 端点二
-    Point2D GetPoint2() const { return p2_; }
+    // 向量
+    Point2D GetDirection() const {
+      return end_ - start_;
+    }
+    // 起点
+    Point2D GetStart() const { return start_; }
+    // 终点
+    Point2D GetEnd() const { return end_; }
 
     // 特征线段拟合
     std::vector<LineSegment> FitLineSegments(const std::vector<Point2D>& points);
+    // 线段在车辆航向上的投影
+    double ProjectLength(double heading) const;
   private:
     // 计算点到线段的距离
     double DistanceToLine(const Point2D& p, const LineSegment& line);
@@ -32,6 +38,7 @@ class LineSegment {
     LineSegment FitLineSegment(const Cluster& cluster);
     // 合并相邻线段
     std::vector<LineSegment> MergeLineSegments(const std::vector<LineSegment>& segments);
-    Point2D p1_, p2_;
+
+    Point2D start_, end_;
     LineFitParams line_fit_params_;
 };

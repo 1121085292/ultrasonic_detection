@@ -9,7 +9,7 @@ std::vector<LineSegment> LineSegment::FitLineSegments(const std::vector<Point2D>
     if (static_cast<int>(cluster.size()) < line_fit_params_.min_cluster_size) continue;
     
     LineSegment line(cluster.front(), cluster.back());
-    std::vector<Point2D> inliers = {line.p1_, line.p2_};
+    std::vector<Point2D> inliers = {line.start_, line.end_};
     std::vector<Point2D> remaining_points = cluster;
     remaining_points.erase(remaining_points.begin());
     remaining_points.erase(remaining_points.end() - 1);
@@ -48,14 +48,23 @@ std::vector<LineSegment> LineSegment::FitLineSegments(const std::vector<Point2D>
   return MergeLineSegments(line_segments);
 }
 
+double LineSegment::ProjectLength(double heading) const
+{
+  Point2D direction(cos(heading), sin(heading));
+  Point2D d = GetDirection();
+  double dp = d.x * direction.x + d.y * direction.y;
+  Point2D proj = direction * dp;
+  return Point2D(start_, start_ + proj).Length();
+}
+
 double LineSegment::DistanceToLine(const Point2D &p, const LineSegment &line)
 {
   // 线段长度
   const double length = line.Length();
   // 
-  double pd_x = p.x - line.p1_.x;
-  double pd_y = p.y - line.p1_.y;
-  Point2D d((line.p2_ - line.p1_).x, (line.p2_ - line.p1_).y);
+  double pd_x = p.x - line.start_.x;
+  double pd_y = p.y - line.start_.y;
+  Point2D d((line.end_ - line.start_).x, (line.end_ - line.start_).y);
   double offset = pd_x * d.x;
   if(length > 0){
     offset /= length;
@@ -64,7 +73,7 @@ double LineSegment::DistanceToLine(const Point2D &p, const LineSegment &line)
   if(offset < 0){
     return hypot(pd_x, pd_y);
   } else if(offset > length){
-    return hypot(p.x - line.p2_.x, p.y - line.p2_.y);
+    return hypot(p.x - line.end_.x, p.y - line.end_.y);
   } else {
     return fabs(pd_x * d.x - pd_y * d.y) / length;
   }
@@ -130,17 +139,17 @@ std::vector<LineSegment> LineSegment::MergeLineSegments(const std::vector<LineSe
     const LineSegment& curr = segments[i];
     const LineSegment& prev = merged.back();
 
-    double dx1 = prev.p2_.x - prev.p1_.x;
-    double dy1 = prev.p2_.y - prev.p1_.y;
-    double dx2 = curr.p2_.x - curr.p1_.x;
-    double dy2 = curr.p2_.y - curr.p1_.y;
+    double dx1 = prev.end_.x - prev.start_.x;
+    double dy1 = prev.end_.y - prev.start_.y;
+    double dx2 = curr.end_.x - curr.start_.x;
+    double dy2 = curr.end_.y - curr.start_.y;
     double cos_angle = (dx1*dx2 + dy1*dy2) / (sqrt(dx1*dx1 + dy1*dy1) * sqrt(dx2*dx2 + dy2*dy2));
     double angle = acos(cos_angle);
     if (angle < line_fit_params_.merge_angle_threshold) {
-      double dist = DistanceToLine(curr.p1_,  prev);
+      double dist = DistanceToLine(curr.start_,  prev);
       if (dist < line_fit_params_.merge_dist_threshold) {
-        Point2D newP2(prev.p2_.x + dx1, prev.p2_.y + dy1);
-        merged.back() = LineSegment(prev.p1_, newP2);
+        Point2D newP2(prev.end_.x + dx1, prev.end_.y + dy1);
+        merged.back() = LineSegment(prev.start_, newP2);
       } else {
         merged.emplace_back(curr);
       }

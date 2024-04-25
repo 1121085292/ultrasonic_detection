@@ -64,8 +64,8 @@ int main()
         vector<LineSegment> lineSegments = LineSegment().FitLineSegments(points);
         for (const LineSegment& ls : lineSegments)
         {
-            line(image, Point(ls.GetPoint1().x, ls.GetPoint1().y),
-                        Point(ls.GetPoint2().x, ls.GetPoint2().y), Scalar(0, 0, 255), 2);
+            line(image, Point(ls.GetStart().x, ls.GetStart().y),
+                        Point(ls.GetEnd().x, ls.GetEnd().y), Scalar(0, 0, 255), 2);
         }
 
         imshow("Line Segment Fitting", image);
