@@ -23,11 +23,6 @@ struct LineFitParams
   float min_fit_distance = 0.6f;
   double merge_angle_threshold = 10 * M_PI / 180;
   double merge_dist_threshold = 0.05;
-};
-
-struct ClusterParams
-{
   double cluster_dist_threshold = 0.5;
   int min_cluster_size = 5;
 };
-

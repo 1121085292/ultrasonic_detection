@@ -6,8 +6,8 @@ void UltrasonicDetection::TriangleMeasuredPositionCalculate(){
   Point3D ul_pos = ul_.GetUltraCoordinate();
   Point3D ur_pos = ur_.GetUltraCoordinate();
   
-  if(ul_dis == ul_.ultra_params_.max_range ||
-     ur_dis == ul_.ultra_params_.max_range){
+  if(ul_dis == ultra_params_.max_range ||
+     ur_dis == ultra_params_.max_range){
     point_ = Point2D(0.0, 0.0);
     ul_.SetStatus(Status::OverDetection);
   } else {

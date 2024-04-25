@@ -34,4 +34,5 @@ class UltrasonicDetection {
     Point2D point_;
     // 全局坐标系下障碍物位置
     Point2D point_global_;
+    UltrasonicParams ultra_params_;
 };

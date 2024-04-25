@@ -4,13 +4,13 @@ std::vector<LineSegment> LineSegment::FitLineSegments(const std::vector<Point2D>
 {
   std::vector<LineSegment> line_segments;
   // 聚类
-  std::vector<Cluster> clusters = cluster_.ClusterPoints(points);
+  std::vector<Cluster> clusters = ClusterPoints(points);
   for (const auto& cluster : clusters) {
-    if (cluster.size() < cluster_.cluster_params_.min_cluster_size) continue;
+    if (static_cast<int>(cluster.size()) < line_fit_params_.min_cluster_size) continue;
     
     LineSegment line(cluster.front(), cluster.back());
-    vector<Point2D> inliers = {line.p1, line.p2};
-    vector<Point2D> remaining_points = cluster;
+    std::vector<Point2D> inliers = {line.p1_, line.p2_};
+    std::vector<Point2D> remaining_points = cluster;
     remaining_points.erase(remaining_points.begin());
     remaining_points.erase(remaining_points.end() - 1);
 
@@ -25,7 +25,7 @@ std::vector<LineSegment> LineSegment::FitLineSegments(const std::vector<Point2D>
         }
       }
       if(max_distance > line_fit_params_.merge_dist_threshold){
-        std::vector<Point2D> split1(inliers.begin(), inliers.end());
+        Cluster split1(inliers.begin(), inliers.end());
         split1.emplace_back(max_point);
         LineSegment line1 = FitLineSegment(split1);
         line_segments.emplace_back(line1);
@@ -35,12 +35,12 @@ std::vector<LineSegment> LineSegment::FitLineSegments(const std::vector<Point2D>
         inliers = split2;
         line = FitLineSegment(inliers);
       } else {
-        inliers.insert(inliers.end(), remaining_points.begin(), remaining_points.end())
+        inliers.insert(inliers.end(), remaining_points.begin(), remaining_points.end());
         line = FitLineSegment(inliers);
         break;
       }
-      remaining_points.erase(remove_if(remaining_points.begin(), remaining_points.end(),
-                          [&maxPoint](const Point2D& p) { return p.x == max_point.x && p.y == max_point.y;}),
+      remaining_points.erase(std::remove_if(remaining_points.begin(), remaining_points.end(),
+                          [&max_point](const Point2D& p) { return p.x == max_point.x && p.y == max_point.y;}),
                            remaining_points.end());
     }
     line_segments.emplace_back(line);
@@ -51,7 +51,7 @@ std::vector<LineSegment> LineSegment::FitLineSegments(const std::vector<Point2D>
 double LineSegment::DistanceToLine(const Point2D &p, const LineSegment &line)
 {
   // 线段长度
-  double length = line.Length(line.p2_, line.p1_);
+  const double length = line.Length();
   // 
   double pd_x = p.x - line.p1_.x;
   double pd_y = p.y - line.p1_.y;
@@ -66,8 +66,33 @@ double LineSegment::DistanceToLine(const Point2D &p, const LineSegment &line)
   } else if(offset > length){
     return hypot(p.x - line.p2_.x, p.y - line.p2_.y);
   } else {
-    return fabs(pd_x * d.x - pd_y * d.y) / len;
+    return fabs(pd_x * d.x - pd_y * d.y) / length;
   }
+}
+
+std::vector<Cluster> LineSegment::ClusterPoints(const std::vector<Point2D> &points){
+  std::vector<Cluster> clusters;
+  std::vector<bool> clustered(points.size(), false);
+
+  for(size_t i = 0; i < points.size(); ++i){
+    if (clustered[i]) continue;
+    Cluster cluster = {points[i]};
+    clustered[i] = true;
+    // 计算相邻点的距离，满足阈值认为是一个簇
+    for(size_t j = i + 1; j < points.size(); ++j){
+      if(clustered[j]) continue;
+      double dist = hypot(points[i].x - points[j].x, points[i].y - points[j].y);
+      if(dist < line_fit_params_.cluster_dist_threshold){
+        cluster.emplace_back(points[j]);
+        clustered[j] = true;
+      }
+    }
+    // 当簇内点的数量大于阈值时，认为是有效簇
+    if(static_cast<int>(cluster.size()) > line_fit_params_.min_cluster_size){
+      clusters.emplace_back(cluster);
+    }
+  }
+  return clusters;
 }
 
 LineSegment LineSegment::FitLineSegment(const Cluster &cluster){
@@ -82,7 +107,7 @@ LineSegment LineSegment::FitLineSegment(const Cluster &cluster){
   double sumXX = 0, sumXY = 0, sumYY = 0;
   for(const auto& p : cluster) {
     double dx =  p.x - centroid.x;
-    double dy = p.y - centtroid.y;
+    double dy = p.y - centroid.y;
     sumXX += dx * dx;
     sumXY += dx * dy;
     sumYY += dy * dy;
@@ -105,17 +130,17 @@ std::vector<LineSegment> LineSegment::MergeLineSegments(const std::vector<LineSe
     const LineSegment& curr = segments[i];
     const LineSegment& prev = merged.back();
 
-    double dx1 = prev.p2.x - prev.p1.x;
-    double dy1 = prev.p2.y - prev.p1.y;
-    double dx2 = curr.p2.x - curr.p1.x;
-    double dy2 = curr.p2.y - curr.p1.y;
+    double dx1 = prev.p2_.x - prev.p1_.x;
+    double dy1 = prev.p2_.y - prev.p1_.y;
+    double dx2 = curr.p2_.x - curr.p1_.x;
+    double dy2 = curr.p2_.y - curr.p1_.y;
     double cos_angle = (dx1*dx2 + dy1*dy2) / (sqrt(dx1*dx1 + dy1*dy1) * sqrt(dx2*dx2 + dy2*dy2));
     double angle = acos(cos_angle);
     if (angle < line_fit_params_.merge_angle_threshold) {
-      double dist = DistanceToLine(curr.p1,  prev);
+      double dist = DistanceToLine(curr.p1_,  prev);
       if (dist < line_fit_params_.merge_dist_threshold) {
-        Point2D newP2(prev.p2.x + dx1, prev.p2.y + dy1);
-        merged.back() = LineSegment(prev.p1, newP2);
+        Point2D newP2(prev.p2_.x + dx1, prev.p2_.y + dy1);
+        merged.back() = LineSegment(prev.p1_, newP2);
       } else {
         merged.emplace_back(curr);
       }

@@ -6,7 +6,7 @@ struct Point2D {
   Point2D(double x = 0, double y = 0) 
     :  x(x), y(y) {}
   
-  Point2D& operator-(const Point2D& other){
+  Point2D operator-(const Point2D& other) const {
     return Point2D(x - other.x, y - other.y);
   }
 
