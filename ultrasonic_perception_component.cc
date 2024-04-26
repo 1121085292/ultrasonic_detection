@@ -31,8 +31,11 @@ bool UltrasonicComponent::Init()
 
   // 使用三角测距
   use_triangle_measured_ = ultra_coordinate.use_triangle_measured();
+  // 空间车位识别
+  parking_spot_detect_ptr_ = std::make_shared<ParkingSpotDetection>();
   // init ultrasonic writer channel
-  ultrasonic_writer_ = node_->CreateWriter<UltrasonicList>("perception/ultrasonic");
+  ultrasonic_writer_ = node_->CreateWriter<UltrasonicList>("perception/ultrasonic/obstalce");
+  parking_spot_writer_ = node_->CreateWriter<TargetParkingSpotInfo>("perception/ultrasonic/parking_spot");
   return true;
 }
 
@@ -108,26 +111,20 @@ bool UltrasonicComponent::Proc(
   * 使用FSL和FSR进行空间车位识别
   * 存储20帧障碍物位置，数据滤波后进行线段拟合，通过横向和纵向距离进行阈值判断，识别潜在车位
   */
-  // 存储当前帧障碍物位置
-  std::vector<Point2D>
+  // 车位
+  std::vector<Point2D> parking_vertices;
   for(const auto& pair : global_pos_map){
     if(pair.first == 0){
-      fsl_pos_.push(pair.second);
+      parking_spot_detect_ptr_->ParkingSpotSearch(pair.second, pose, parking_vertices);
     }
     if(pair.first == 5){
-      fsr_pos_.push(pair.second);
+      parking_spot_detect_ptr_->ParkingSpotSearch(pair.second, pose, parking_vertices);
     }
   }
-  // 当存储10帧后开始进行数据滤波，线段拟合
-  auto ul_fsl = std::make_shared<Ultrasonic>(coordinate_map_[0], global_pos_map[0]);
-  auto ul_fsr = std::make_shared<Ultrasonic>(coordinate_map_[5], global_pos_map[5]);
-  // 拟合线段
-  LineFitInfo line;
-  ul_fsl->HoughFilter(fsl_pos_, line);
 
   // 组织数据
-  auto ultrasonic_list = std::make_shared<UltrasonicList>();
   // 测距定位信息
+  auto ultrasonic_list = std::make_shared<UltrasonicList>();
   FillUltraObject(pos_map, global_pos_map, ultrasonic_list);
   auto now = Clock::NowInSeconds();
   ultrasonic_list->set_timestamp(now);
@@ -137,9 +134,12 @@ bool UltrasonicComponent::Proc(
   } else {
     ultrasonic_list->set_error_code(common_msgs::error_code::ErrorCode::PERCEPTION_ERROR);
   }
-
-
+  // 空间车位信息
+  auto parking_spot = std::make_shared<TargetParkingSpotInfo>();
+  FillParkingSpot(parking_vertices, parking_spot);
+  // 发布
   ultrasonic_writer_->Write(ultrasonic_list);
+  parking_spot_writer_->Write(parking_spot);
   return true;
 }
 
@@ -173,4 +173,24 @@ void UltrasonicComponent::FillUltraObject(
     // 是否三角测距定位
     ul_obj->set_use_triangle(triangle_flag_[sensor_id]);
   }
+}
+
+void UltrasonicComponent::FillParkingSpot(
+    const std::vector<Point2D>& parking_vertices,
+    std::shared_ptr<TargetParkingSpotInfo> &out_msg)
+{
+  std::vector<Point2D> points = parking_vertices;
+  auto target_parking_vertices = out_msg->mutable_target_parking_vertices();
+  // 0号点
+  target_parking_vertices.set_spot_right_top_x(points[0].x);
+  target_parking_vertices.set_spot_right_top_y(points[0].y);
+  // 1号点
+  target_parking_vertices.set_spot_left_top_x(points[1].x);
+  target_parking_vertices.set_spot_left_top_y(points[1].y);
+  // 2号点
+  target_parking_vertices.set_spot_left_down_x(points[2].x);
+  target_parking_vertices.set_spot_left_down_y(points[2].y);
+  // 3号点
+  target_parking_vertices.set_spot_right_down_x(points[3].x);
+  target_parking_vertices.set_spot_right_down_y(points[3].y);
 }

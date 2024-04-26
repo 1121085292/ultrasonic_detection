@@ -27,11 +27,23 @@ struct LineFitParams {
 };
 
 struct ParkingSpotParams{
-  double spot_width_threshold = 0.8;
-  double max_grow_length = 0.8;
   double line_length_threshold = 2500.0;
   double line_width_threshold = 800.0;
   double line_dist = 0.5;
   double line_angle = 10 * M_PI / 180;
+  // 横向偏移
+  double offset_threshold = 300.0;
+  // 车位长度
+  double spot_length_threshold = 5200.0;
+  // 车位深度
+  double spot_width_threshold = 2500.0;
+  // 偏移角度
+  double angle_threshold = 10 * M_PI / 180;
+};
+
+struct CurbParams
+{
+  double angle;
+  double length;
 };
 

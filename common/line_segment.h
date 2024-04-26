@@ -29,9 +29,9 @@ class LineSegment {
     std::vector<LineSegment> FitLineSegments(const std::vector<Point2D>& points);
     // 线段在车辆航向上的投影
     double ProjectLength(double heading) const;
-  private:
     // 计算点到线段的距离
     double DistanceToLine(const Point2D& p, const LineSegment& line);
+  private:
     // 对点云进行聚类
     std::vector<Cluster> ClusterPoints(const std::vector<Point2D> &points);
     // 对点云簇拟合线段
