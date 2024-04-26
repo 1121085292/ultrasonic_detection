@@ -43,3 +43,13 @@ cc_test(
     "@com_google_googletest//:gtest_main"
   ]
 )
+
+cc_library(
+  name = "parking_spot_detection",
+  srcs = ["parking_spot_detection.cc"],
+  hdrs = ["parking_spot_detection.h"],
+  deps = [
+    "//cyber",
+    "//ultrasonic_detection/common:line_segment"
+  ]
+)
