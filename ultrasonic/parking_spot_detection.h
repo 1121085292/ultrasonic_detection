@@ -3,52 +3,73 @@
 
 #include "cyber/cyber.h"
 #include "ultrasonic_detection/common/line_segment.h"
+#include "ultrasonic_detection/common_msgs/InsLocation.pb.h"
 
+using Pose = common_msgs::InsLocation::InsLocation_Pose;
 
 enum ParkingSpaceType {
   VERTICAL_PLOT = 0,
   PARALLEL_PARKING = 1
 };
 
+/*    // 线段拟合参数
+    LineFitParams line_fit_params_;
+    // 空间车位识别参数
+    ParkingSpotParams parking_spot_params_;
+    // 路牙识别参数
+    CurbParams curb_params_;*/
 class ParkingSpotDetection {
   public:
     // 空间车位搜索
     void ParkingSpotSearch(
-        const Point2D& point, const Pose &pose,
+        const Point2D& point, const std::shared_ptr<Pose> &pose,
+        const LineFitParams& line_fit_params,
+        const ParkingSpotParams& parking_spot_params,
+        const CurbParams& curb_params,
         std::vector<Point2D>& parking_vertices);
     // 车位类别
     ParkingSpaceType GetParkingSpaceType() { return parking_space_type_; }
     // 车位位姿计算
-    double CalculateParkingSpotAngle(const Pose &pose);
+    double CalculateParkingSpotAngle(const std::shared_ptr<Pose> &pose);
         
   private:
     // 潜在车位搜索
     void FindPotentialParkingSpots(
-        const vector<LineSegment> &fit_lines, const Pose &pose,
+        const std::vector<LineSegment> &fit_lines,
+        const std::shared_ptr<Pose> &pose,
+        const ParkingSpotParams& parking_spot_params,
+        const CurbParams& curb_params,
         std::map<int, std::vector<LineSegment>>& line_segments);
 
     // 潜在车位再判断
     bool ReEvaluateParallelParkingSpot(
-        const std::map<int, std::vector<LineSegment>> &line_segment_pair,
-        const Pose &pose);
+        const std::pair<int, std::vector<LineSegment>> &line_segment_pair,
+        const ParkingSpotParams& parking_spot_params,
+        const std::shared_ptr<Pose> &pose);
 
     // 车位约束条件判断
-    bool CheckParkingSpotConstraints();
+    bool CheckParkingSpotConstraints(
+      const std::shared_ptr<Pose>& pose,
+      const ParkingSpotParams& parking_spot_params);
 
     // 车位角点计算
-    void CalculateParkingVertices(double angle, ParkingVertices& parking_vertices);
+    void CalculateParkingVertices(double angle, std::vector<Point2D>& parking_vertices);
     // 生长线段
     double GrowLineSegment(
-        LineSegment& line, int key,
-        bool flag, const Pose& pose);
+        const LineSegment& line, int key, bool flag,
+        const ParkingSpotParams& parking_spot_params,
+        const std::shared_ptr<Pose>& pose);
     // 计算两线段夹角
     double AngleBetweenLines(const LineSegment& line1, const LineSegment& line2);
 
     // 判断是否为路牙特征线段
-    bool IsCurbLine(const LineSegment& line, const Pose& pose);
+    bool IsCurbLine(
+        const LineSegment& line,
+        const CurbParams& curb_params,
+        const std::shared_ptr<Pose>& pose);
 
     // 匹配线段对
-    std::pair<LineSegment, LineSegment> parking_spot_;
+    std::vector<LineSegment> parking_spot_;
 
     std::shared_ptr<LineSegment> line_segment_ptr_;
     std::vector<LineSegment> fit_lines_;

@@ -1,13 +1,10 @@
 #pragma once
 
-#include "ultrasonic_detection/proto/ultrasonic_coordinate.pb.h"
 #include "ultrasonic_detection/common_msgs/ultrasonic.pb.h"
 #include "ultrasonic_detection/common_msgs/InsLocation.pb.h"
 #include "ultrasonic_detection/base/params.h"
 #include "ultrasonic_detection/base/point.h"
-#include "ultrasonic_detection/common/line_segment.h"
 
-using ultrasonic_detection::proto::UltrasonicCoordinate;
 using common_msgs::ultrasonic::Status;
 using common_msgs::InsLocation::InsLocation;
 using Pose = common_msgs::InsLocation::InsLocation_Pose;

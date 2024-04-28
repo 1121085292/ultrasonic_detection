@@ -5,37 +5,54 @@ using Clock = apollo::cyber::Clock;
 
 bool UltrasonicComponent::Init()
 {
-  // 导入探头安装坐标文件
-  UltrasonicCoordinate ultra_coordinate;
-  if(!apollo::cyber::common::GetProtoFromFile(config_file_path_, &ultra_coordinate)){
+  // 导入超声波雷达检测配置文件
+  UltrasonicConfig ultra_config;
+  if(!apollo::cyber::common::GetProtoFromFile(config_file_path_, &ultra_config)){
     AERROR << "Read config failed: " << config_file_path_;
     return false;
   }
-  AINFO << "Ultrasonic Coordinate:\n" << ultra_coordinate.DebugString();
+  ADEBUG << "Ultrasonic Config:\n" << ultra_config.DebugString();
+  // 探头安装坐标
+  ultrasonic_detection::proto::UltrasonicCoordinate ultra_coordinate;
   // 左侧2个探头在整车坐标系下的位置
-  coordinate_map_[0] = Point(ultra_coordinate.fsl_x(), ultra_coordinate.fsl_y(), ultra_coordinate.fsl_angle() * M_PI / 180);
-  coordinate_map_[11] = Point(ultra_coordinate.rsr_x(), ultra_coordinate.rsr_y(), ultra_coordinate.rsr_angle() * M_PI / 180);
+  coordinate_map_[0] = Point3D(ultra_coordinate.fsl_x(), ultra_coordinate.fsl_y(), ultra_coordinate.fsl_angle() * M_PI / 180);
+  coordinate_map_[11] = Point3D(ultra_coordinate.rsr_x(), ultra_coordinate.rsr_y(), ultra_coordinate.rsr_angle() * M_PI / 180);
   // 前4个探头在整车坐标系下的位置
-  coordinate_map_[1] = Point(ultra_coordinate.fol_x(), ultra_coordinate.fol_y(), ultra_coordinate.fol_angle() * M_PI / 180);
-  coordinate_map_[2] = Point(ultra_coordinate.fcl_x(), ultra_coordinate.fcl_y(), ultra_coordinate.fcl_angle() * M_PI / 180);
-  coordinate_map_[3] = Point(ultra_coordinate.fcr_x(), ultra_coordinate.fcr_y(), ultra_coordinate.fcr_angle() * M_PI / 180);
-  coordinate_map_[4] = Point(ultra_coordinate.for_x(), ultra_coordinate.for_y(), ultra_coordinate.for_angle() * M_PI / 180);
+  coordinate_map_[1] = Point3D(ultra_coordinate.fol_x(), ultra_coordinate.fol_y(), ultra_coordinate.fol_angle() * M_PI / 180);
+  coordinate_map_[2] = Point3D(ultra_coordinate.fcl_x(), ultra_coordinate.fcl_y(), ultra_coordinate.fcl_angle() * M_PI / 180);
+  coordinate_map_[3] = Point3D(ultra_coordinate.fcr_x(), ultra_coordinate.fcr_y(), ultra_coordinate.fcr_angle() * M_PI / 180);
+  coordinate_map_[4] = Point3D(ultra_coordinate.for_x(), ultra_coordinate.for_y(), ultra_coordinate.for_angle() * M_PI / 180);
   // 后4个探头在整车坐标系下的位置
-  coordinate_map_[7] = Point(ultra_coordinate.rol_x(), ultra_coordinate.rol_y(), ultra_coordinate.rol_angle() * M_PI / 180);
-  coordinate_map_[8] = Point(ultra_coordinate.rcl_x(), ultra_coordinate.rcl_y(), ultra_coordinate.rcl_angle() * M_PI / 180);
-  coordinate_map_[9] = Point(ultra_coordinate.rcr_x(), ultra_coordinate.rcr_y(), ultra_coordinate.rcr_angle() * M_PI / 180);
-  coordinate_map_[10] = Point(ultra_coordinate.ror_x(), ultra_coordinate.ror_y(), ultra_coordinate.ror_angle() * M_PI / 180);
+  coordinate_map_[7] = Point3D(ultra_coordinate.rol_x(), ultra_coordinate.rol_y(), ultra_coordinate.rol_angle() * M_PI / 180);
+  coordinate_map_[8] = Point3D(ultra_coordinate.rcl_x(), ultra_coordinate.rcl_y(), ultra_coordinate.rcl_angle() * M_PI / 180);
+  coordinate_map_[9] = Point3D(ultra_coordinate.rcr_x(), ultra_coordinate.rcr_y(), ultra_coordinate.rcr_angle() * M_PI / 180);
+  coordinate_map_[10] = Point3D(ultra_coordinate.ror_x(), ultra_coordinate.ror_y(), ultra_coordinate.ror_angle() * M_PI / 180);
   // 右侧2个探头在整车坐标系下的位置
-  coordinate_map_[5] = Point(ultra_coordinate.fsr_x(), ultra_coordinate.fsr_y(), ultra_coordinate.fsr_angle() * M_PI / 180);
-  coordinate_map_[6] = Point(ultra_coordinate.rsl_x(), ultra_coordinate.rsl_y(), ultra_coordinate.rsl_angle() * M_PI / 180);
+  coordinate_map_[5] = Point3D(ultra_coordinate.fsr_x(), ultra_coordinate.fsr_y(), ultra_coordinate.fsr_angle() * M_PI / 180);
+  coordinate_map_[6] = Point3D(ultra_coordinate.rsl_x(), ultra_coordinate.rsl_y(), ultra_coordinate.rsl_angle() * M_PI / 180);
 
   // 使用三角测距
-  use_triangle_measured_ = ultra_coordinate.use_triangle_measured();
+  use_triangle_measured_ = ultra_config.use_triangle_measured();
+  // Line Fit
+  line_fit_params_.min_fit_num = ultra_config.line_fit_config().min_fit_num();
+  line_fit_params_.min_cluster_size = ultra_config.line_fit_config().min_cluster_size();
+  line_fit_params_.cluster_dist_threshold = ultra_config.line_fit_config().cluster_dist_threshold();
+  line_fit_params_.merge_angle_threshold = ultra_config.line_fit_config().merge_angle_threshold();
+  line_fit_params_.merge_dist_threshold = ultra_config.line_fit_config().merge_dist_threshold();
+  // Parking Spot
+  parking_spot_params_.grow_line_dist = ultra_config.parking_spot_config().grow_line_dist();
+  parking_spot_params_.grow_line_angle = ultra_config.parking_spot_config().grow_line_angle();
+  parking_spot_params_.min_line_distance = ultra_config.parking_spot_config().min_line_distance();
+  parking_spot_params_.offset_threshold = ultra_config.parking_spot_config().offset_threshold();
+  parking_spot_params_.angle_threshold = ultra_config.parking_spot_config().angle_threshold();
+  // Curb
+  curb_params_.angle_threshold = ultra_config.curb_config().angle_threshold();
+  curb_params_.length_threshold = ultra_config.curb_config().length_threshold();
+
   // 空间车位识别
   parking_spot_detect_ptr_ = std::make_shared<ParkingSpotDetection>();
   // init ultrasonic writer channel
-  ultrasonic_writer_ = node_->CreateWriter<UltrasonicList>("perception/ultrasonic/obstalce");
-  parking_spot_writer_ = node_->CreateWriter<TargetParkingSpotInfo>("perception/ultrasonic/parking_spot");
+  ultrasonic_writer_ = node_->CreateWriter<UltrasonicList>("perception/ultrasonic");
   return true;
 }
 
@@ -54,11 +71,21 @@ bool UltrasonicComponent::Proc(
       AERROR << "No." << sensor_id << " Ultrasonic Error";
       distances.emplace_back(6000);
     } else {
-      for(const auto& distance : echo.distances()){
+      for(const auto& distance : distances){
         distances.emplace_back(distance);
       }
     }
+#ifdef Minfilter
+    // TODO:min_filter?
+    std::vector<int> filtered_distances;
+    MinFilter min_filter(MinFilterParams().window_size, MinFilterParams().threshold);
+    min_filter.FilterData(distances, filtered_distances);
+    // 从小到大排序，找最近距离目标
+    sort(filtered_distances.begin(), filtered_distances.end());
+    dis_map[sensor_id] = filtered_distances;
+#else
     dis_map[sensor_id] = distances;
+#endif
   }
 
   // 根据探头配置选择测距方式，实现探头定位
@@ -109,22 +136,25 @@ bool UltrasonicComponent::Proc(
   // 空间车位识别
   /*
   * 使用FSL和FSR进行空间车位识别
-  * 存储20帧障碍物位置，数据滤波后进行线段拟合，通过横向和纵向距离进行阈值判断，识别潜在车位
+  * 存储10帧障碍物位置后，拟合边界线段，对满足要求的线段对进行生长再判断
   */
   // 车位
-  std::vector<Point2D> parking_vertices;
+  std::vector<Point2D> fsl_parking_vertices;
+  std::vector<Point2D> fsr_parking_vertices;
   for(const auto& pair : global_pos_map){
     if(pair.first == 0){
-      parking_spot_detect_ptr_->ParkingSpotSearch(pair.second, pose, parking_vertices);
+      parking_spot_detect_ptr_->ParkingSpotSearch(pair.second, pose,
+              line_fit_params_, parking_spot_params_, curb_params_, fsl_parking_vertices);
     }
     if(pair.first == 5){
-      parking_spot_detect_ptr_->ParkingSpotSearch(pair.second, pose, parking_vertices);
+      parking_spot_detect_ptr_->ParkingSpotSearch(pair.second, pose,
+              line_fit_params_, parking_spot_params_, curb_params_, fsr_parking_vertices);
     }
   }
 
   // 组织数据
-  // 测距定位信息
   auto ultrasonic_list = std::make_shared<UltrasonicList>();
+  // 测距定位信息
   FillUltraObject(pos_map, global_pos_map, ultrasonic_list);
   auto now = Clock::NowInSeconds();
   ultrasonic_list->set_timestamp(now);
@@ -135,17 +165,15 @@ bool UltrasonicComponent::Proc(
     ultrasonic_list->set_error_code(common_msgs::error_code::ErrorCode::PERCEPTION_ERROR);
   }
   // 空间车位信息
-  auto parking_spot = std::make_shared<TargetParkingSpotInfo>();
-  FillParkingSpot(parking_vertices, parking_spot);
+  FillParkingSpot(fsr_parking_vertices, ultrasonic_list);
   // 发布
   ultrasonic_writer_->Write(ultrasonic_list);
-  parking_spot_writer_->Write(parking_spot);
   return true;
 }
 
 void UltrasonicComponent::FillUltraObject(
-    const std::map<int, Point> &points_map,
-    const std::map<int, Point> &global_pos_map,
+    const std::map<int, Point2D> &points_map,
+    const std::map<int, Point2D> &global_pos_map,
     std::shared_ptr<UltrasonicList>& out_msg){
   
   auto tmp_map1 = points_map;
@@ -177,20 +205,21 @@ void UltrasonicComponent::FillUltraObject(
 
 void UltrasonicComponent::FillParkingSpot(
     const std::vector<Point2D>& parking_vertices,
-    std::shared_ptr<TargetParkingSpotInfo> &out_msg)
+    std::shared_ptr<UltrasonicList> &out_msg)
 {
   std::vector<Point2D> points = parking_vertices;
-  auto target_parking_vertices = out_msg->mutable_target_parking_vertices();
+  auto target_parking_spot_info = out_msg->mutable_target_parking_spot_info();
+  auto target_parking_vertices = target_parking_spot_info->mutable_target_parking_vertices();
   // 0号点
-  target_parking_vertices.set_spot_right_top_x(points[0].x);
-  target_parking_vertices.set_spot_right_top_y(points[0].y);
+  target_parking_vertices->set_spot_right_top_x(points[0].x);
+  target_parking_vertices->set_spot_right_top_y(points[0].y);
   // 1号点
-  target_parking_vertices.set_spot_left_top_x(points[1].x);
-  target_parking_vertices.set_spot_left_top_y(points[1].y);
+  target_parking_vertices->set_spot_left_top_x(points[1].x);
+  target_parking_vertices->set_spot_left_top_y(points[1].y);
   // 2号点
-  target_parking_vertices.set_spot_left_down_x(points[2].x);
-  target_parking_vertices.set_spot_left_down_y(points[2].y);
+  target_parking_vertices->set_spot_left_down_x(points[2].x);
+  target_parking_vertices->set_spot_left_down_y(points[2].y);
   // 3号点
-  target_parking_vertices.set_spot_right_down_x(points[3].x);
-  target_parking_vertices.set_spot_right_down_y(points[3].y);
+  target_parking_vertices->set_spot_right_down_x(points[3].x);
+  target_parking_vertices->set_spot_right_down_y(points[3].y);
 }

@@ -43,6 +43,8 @@ message UltrasonicList {
   optional uint32 timestamp = 1;
   // 车辆12个探头输出的障碍物
   repeated Ultrasonic ul_obj = 2;
-  //  错误码
+  // 错误码
   optional common_msgs.error_code.ErrorCode error_code = 3;
+  // 空间车位
+  optional apollo.parking.proto.TargetParkingSpotInfo target_parking_spot_info = 4;
 }

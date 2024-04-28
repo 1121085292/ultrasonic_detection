@@ -13,6 +13,10 @@ struct Point2D {
   Point2D operator+(const Point2D& other) const {
     return Point2D(x + other.x, y + other.y);
   }
+  // 重载*号
+  Point2D operator*(double value) const {
+    return Point2D(x * value, y * value);
+  }
   // 点乘
   double dot(const Point2D& other) const {
     return x * other.x + y * other.y;
@@ -22,7 +26,7 @@ struct Point2D {
     return x * other.y - y * other.x;
   }
   // 模长
-  double Length(){
+  double Length() const {
     return hypot(x, y);
   }
   // 单位向量
@@ -40,7 +44,12 @@ struct Point3D{
   Point3D(double x_val, double y_val, double angle_val)
    : x(x_val), y(y_val), angle(angle_val){}
 
-  double Length(){
+  double Length() const {
     return hypot(x, y);
+  }
+
+  // 重载-号
+  Point3D operator-(const Point3D& other) const {
+    return Point3D(x - other.x, y - other.y, 0.0);
   }
 };

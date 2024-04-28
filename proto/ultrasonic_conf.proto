@@ -49,7 +49,50 @@ message UltrasonicCoordinate {
   optional double RSR_x = 34 [default = -383.4];
   optional double RSR_y = 35 [default = -917.2];
   optional double RSR_angle = 36 [default = 98.5];
+}
 
+message LineFitConfig {
+  //  拟合线段所需最小障碍物点数量
+  optional uint32 min_fit_num = 1;
+  //  聚类所需最小障碍物点数量
+  optional uint32 min_cluster_size = 2;
+  //  聚类距离阈值/mm
+  optional double cluster_dist_threshold = 3;
+  //  合并线段距离阈值/mm
+  optional double merge_angle_threshold = 4;
+  //  合并线段角度阈值/°
+  optional double merge_dist_threshold = 5;
+}
+
+message ParkingSpotConfig {
+  //  线段生长时距离阈值
+  optional double grow_line_dist = 1;
+  //  线段生长时角度阈值
+  optional double grow_line_angle = 2;
+  //  生长时拟合线段的最短长度/mm
+  optional double min_line_distance = 3;
+  //  横向偏移
+  optional double offset_threshold = 4;
+  //  偏移角度
+  optional double angle_threshold = 5;
+}
+
+message CurbConfig {
+  //  判断是否为路牙线段的角度阈值
+  optional double angle_threshold = 1;
+  //  判断是否为路牙线段的长度阈值
+  optional double length_threshold = 2;
+}
+
+message UltrasonicConfig {
+  //  安装位置
+  optional UltrasonicCoordinate ultrasonic_coordinate = 1;
   //  三角测距
-  optional bool use_triangle_measured = 37 [default = false];
+  optional bool use_triangle_measured = 2 [default = false];
+  //  线段拟合
+  optional LineFitConfig line_fit_config = 3;
+  //  空间车位
+  optional ParkingSpotConfig parking_spot_config = 4;
+  //  路牙
+  optional CurbConfig curb_config = 5;
 }

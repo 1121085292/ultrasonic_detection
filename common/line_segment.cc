@@ -1,7 +1,25 @@
 #include "line_segment.h"
 
-std::vector<LineSegment> LineSegment::FitLineSegments(const std::vector<Point2D> &points)
+void LineSegment::Init(const LineFitParams &line_fit_params)
 {
+  if(!is_init_){
+    line_fit_params_.min_fit_num = line_fit_params.min_fit_num;
+    line_fit_params_.min_cluster_size = line_fit_params.min_cluster_size;
+    line_fit_params_.cluster_dist_threshold = line_fit_params.cluster_dist_threshold;
+    line_fit_params_.merge_angle_threshold = line_fit_params.merge_angle_threshold;
+    line_fit_params_.merge_dist_threshold = line_fit_params.merge_dist_threshold;
+    
+    is_init_ = true;
+  }
+}
+
+std::vector<LineSegment> LineSegment::FitLineSegments(
+    const std::vector<Point2D> &points,
+    const LineFitParams &line_fit_params)
+{
+  if(!is_init_){
+    Init(line_fit_params);
+  }
   std::vector<LineSegment> line_segments;
   // 聚类
   std::vector<Cluster> clusters = ClusterPoints(points);
@@ -54,7 +72,7 @@ double LineSegment::ProjectLength(double heading) const
   Point2D d = GetDirection();
   double dp = d.x * direction.x + d.y * direction.y;
   Point2D proj = direction * dp;
-  return Point2D(start_, start_ + proj).Length();
+  return LineSegment(start_, start_ + proj).Length();
 }
 
 double LineSegment::DistanceToLine(const Point2D &p, const LineSegment &line)
@@ -97,7 +115,7 @@ std::vector<Cluster> LineSegment::ClusterPoints(const std::vector<Point2D> &poin
       }
     }
     // 当簇内点的数量大于阈值时，认为是有效簇
-    if(static_cast<int>(cluster.size()) > line_fit_params_.min_cluster_size){
+    if(static_cast<int>(cluster.size()) >= line_fit_params_.min_cluster_size){
       clusters.emplace_back(cluster);
     }
   }
@@ -145,7 +163,7 @@ std::vector<LineSegment> LineSegment::MergeLineSegments(const std::vector<LineSe
     double dy2 = curr.end_.y - curr.start_.y;
     double cos_angle = (dx1*dx2 + dy1*dy2) / (sqrt(dx1*dx1 + dy1*dy1) * sqrt(dx2*dx2 + dy2*dy2));
     double angle = acos(cos_angle);
-    if (angle < line_fit_params_.merge_angle_threshold) {
+    if (angle < line_fit_params_.merge_angle_threshold * M_PI / 180) {
       double dist = DistanceToLine(curr.start_,  prev);
       if (dist < line_fit_params_.merge_dist_threshold) {
         Point2D newP2(prev.end_.x + dx1, prev.end_.y + dy1);

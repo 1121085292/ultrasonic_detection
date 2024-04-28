@@ -26,10 +26,9 @@ cc_library(
   srcs = ["ultrasonic.cc"],
   hdrs = ["ultrasonic.h"],
   deps = [
-    "//ultrasonic_detection/proto:ultrasonic_coordinate_cc_proto",
     "//ultrasonic_detection/common_msgs:ultrasonic_cc_proto",
     "//ultrasonic_detection/common_msgs:InsLocation_cc_proto",
-    "//ultrasonic_detection/min_filter:min_filter",
+    "//ultrasonic_detection/base:point",
     "//ultrasonic_detection/base:params",
   ]
 )
@@ -50,6 +49,7 @@ cc_library(
   hdrs = ["parking_spot_detection.h"],
   deps = [
     "//cyber",
-    "//ultrasonic_detection/common:line_segment"
+    "//ultrasonic_detection/common:line_segment",
+    "//ultrasonic_detection/common_msgs:InsLocation_cc_proto"
   ]
 )

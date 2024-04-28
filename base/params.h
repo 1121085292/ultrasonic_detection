@@ -10,40 +10,34 @@ struct UltrasonicParams {
   int max_range = 6000;
 };
 
-struct Vehicle {
-  int width = 1875;
-  int wheel_base = 2920;
-  int front_delta = 354;
-  int rear_delta = 383;
-};
-
 struct LineFitParams {
-  int min_fit_num = 10;
-  double merge_angle_threshold = 10 * M_PI / 180;
-  double merge_dist_threshold = 0.05;
-  double cluster_dist_threshold = 0.5;
-  int min_cluster_size = 5;
-  double min_fit_distance = 0.6;
+  int min_fit_num;
+  int min_cluster_size;
+  double cluster_dist_threshold;
+  double merge_angle_threshold;
+  double merge_dist_threshold;
 };
 
 struct ParkingSpotParams{
   double line_length_threshold = 2500.0;
   double line_width_threshold = 800.0;
-  double line_dist = 0.5;
-  double line_angle = 10 * M_PI / 180;
-  // 横向偏移
-  double offset_threshold = 300.0;
   // 车位长度
   double spot_length_threshold = 5200.0;
   // 车位深度
   double spot_width_threshold = 2500.0;
+
+  double grow_line_dist;
+  double grow_line_angle;
+  double min_line_distance;
+  // 横向偏移
+  double offset_threshold;
   // 偏移角度
-  double angle_threshold = 10 * M_PI / 180;
+  double angle_threshold;
 };
 
 struct CurbParams
 {
-  double angle;
-  double length;
+  double angle_threshold;
+  double length_threshold;
 };
 

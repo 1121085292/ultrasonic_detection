@@ -7,7 +7,7 @@ import "ultrasonic_detection/common_msgs/error_code.proto";
 message Echo {
   //  ultrasonic orientation
   /*
-  * front  left->right(0-5):FSL(farword_side_left), FOL, FCL, FCR, FOR, FSR
+  * front  left->right(0-5):FSL(forword_side_left), FOL, FCL, FCR, FOR, FSR
   * rear left->right(6-11):RSL(backword_side_left), ROL, RCL, RCR, ROR, RSR
   */
   optional uint32 sensor_id = 1;

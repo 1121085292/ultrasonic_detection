@@ -25,8 +25,13 @@ class LineSegment {
     // 终点
     Point2D GetEnd() const { return end_; }
 
+    // 初始化，参数赋值
+    void Init(const LineFitParams& line_fit_params);
+
     // 特征线段拟合
-    std::vector<LineSegment> FitLineSegments(const std::vector<Point2D>& points);
+    std::vector<LineSegment> FitLineSegments(
+        const std::vector<Point2D>& points,
+        const LineFitParams& line_fit_params);
     // 线段在车辆航向上的投影
     double ProjectLength(double heading) const;
     // 计算点到线段的距离
@@ -39,6 +44,7 @@ class LineSegment {
     // 合并相邻线段
     std::vector<LineSegment> MergeLineSegments(const std::vector<LineSegment>& segments);
 
+    bool is_init_ = false;
     Point2D start_, end_;
     LineFitParams line_fit_params_;
 };

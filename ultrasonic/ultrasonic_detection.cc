@@ -30,7 +30,7 @@ void UltrasonicDetection::TriangleMeasuredPositionCalculate(){
       point_.y = ul_pos.y + ul_dis * sin(alpha + beta);
       ul_.SetStatus(Status::Normal);
     } else {
-      point_ = ul_.GetUltraCoordinate();
+      point_ = Point2D(ul_.GetUltraCoordinate().x, ul_.GetUltraCoordinate().y);
       ul_.SetStatus(Status::InvalidPoint);
     }
   }
@@ -42,7 +42,7 @@ void UltrasonicDetection::GlobalTrianglePositionCalculate(const std::shared_ptr<
   } else {
     point_global_.x = pose->position().x()
           + point_.x * cos(pose->heading()) - point_.y * sin(pose->heading());
-    point_global_.y = pose.position().y()
+    point_global_.y = pose->position().y()
           + point_.x * sin(pose->heading()) + point_.y * cos(pose->heading());
   }
 }

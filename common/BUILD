@@ -12,12 +12,18 @@ cc_library(
   ]
 )
 
-cc_binary(
-  name = "line_segment_test",
-  srcs = ["line_segment_test.cc"],
+cc_library(
+  name = "min_filter",
+  srcs = ["min_filter.cc"],
+  hdrs = ["min_filter.h"],
+)
+
+cc_test(
+  name = "min_filter_test",
+  size = "small",
+  srcs = ["min_filter_test.cc"],
   deps = [
-    ":line_segment",
-    "@opencv//:core",
-    "@opencv//:highgui"
+    ":min_filter",
+    "@com_google_googletest//:gtest_main"
   ]
 )

@@ -9,21 +9,21 @@ class UltrasonicTest : public testing::Test {
   public:
     UltrasonicTest() {
       // 左侧2个探头在整车坐标系下的位置
-      coordinate_map_[0] = Point(ultra_coordinate.fsl_x(), ultra_coordinate.fsl_y(), ultra_coordinate.fsl_angle() * M_PI / 180);
-      coordinate_map_[11] = Point(ultra_coordinate.rsr_x(), ultra_coordinate.rsr_y(), ultra_coordinate.rsr_angle() * M_PI / 180);
+      coordinate_map_[0] = Point3D(ultra_coordinate.fsl_x(), ultra_coordinate.fsl_y(), ultra_coordinate.fsl_angle() * M_PI / 180);
+      coordinate_map_[11] = Point3D(ultra_coordinate.rsr_x(), ultra_coordinate.rsr_y(), ultra_coordinate.rsr_angle() * M_PI / 180);
       // 前4个探头在整车坐标系下的位置
-      coordinate_map_[1] = Point(ultra_coordinate.fol_x(), ultra_coordinate.fol_y(), ultra_coordinate.fol_angle() * M_PI / 180);
-      coordinate_map_[2] = Point(ultra_coordinate.fcl_x(), ultra_coordinate.fcl_y(), ultra_coordinate.fcl_angle() * M_PI / 180);
-      coordinate_map_[3] = Point(ultra_coordinate.fcr_x(), ultra_coordinate.fcr_y(), ultra_coordinate.fcr_angle() * M_PI / 180);
-      coordinate_map_[4] = Point(ultra_coordinate.for_x(), ultra_coordinate.for_y(), ultra_coordinate.for_angle() * M_PI / 180);
+      coordinate_map_[1] = Point3D(ultra_coordinate.fol_x(), ultra_coordinate.fol_y(), ultra_coordinate.fol_angle() * M_PI / 180);
+      coordinate_map_[2] = Point3D(ultra_coordinate.fcl_x(), ultra_coordinate.fcl_y(), ultra_coordinate.fcl_angle() * M_PI / 180);
+      coordinate_map_[3] = Point3D(ultra_coordinate.fcr_x(), ultra_coordinate.fcr_y(), ultra_coordinate.fcr_angle() * M_PI / 180);
+      coordinate_map_[4] = Point3D(ultra_coordinate.for_x(), ultra_coordinate.for_y(), ultra_coordinate.for_angle() * M_PI / 180);
       // 后4个探头在整车坐标系下的位置
-      coordinate_map_[7] = Point(ultra_coordinate.rol_x(), ultra_coordinate.rol_y(), ultra_coordinate.rol_angle() * M_PI / 180);
-      coordinate_map_[8] = Point(ultra_coordinate.rcl_x(), ultra_coordinate.rcl_y(), ultra_coordinate.rcl_angle() * M_PI / 180);
-      coordinate_map_[9] = Point(ultra_coordinate.rcr_x(), ultra_coordinate.rcr_y(), ultra_coordinate.rcr_angle() * M_PI / 180);
-      coordinate_map_[10] = Point(ultra_coordinate.ror_x(), ultra_coordinate.ror_y(), ultra_coordinate.ror_angle() * M_PI / 180);
+      coordinate_map_[7] = Point3D(ultra_coordinate.rol_x(), ultra_coordinate.rol_y(), ultra_coordinate.rol_angle() * M_PI / 180);
+      coordinate_map_[8] = Point3D(ultra_coordinate.rcl_x(), ultra_coordinate.rcl_y(), ultra_coordinate.rcl_angle() * M_PI / 180);
+      coordinate_map_[9] = Point3D(ultra_coordinate.rcr_x(), ultra_coordinate.rcr_y(), ultra_coordinate.rcr_angle() * M_PI / 180);
+      coordinate_map_[10] = Point3D(ultra_coordinate.ror_x(), ultra_coordinate.ror_y(), ultra_coordinate.ror_angle() * M_PI / 180);
       // 右侧2个探头在整车坐标系下的位置
-      coordinate_map_[5] = Point(ultra_coordinate.fsr_x(), ultra_coordinate.fsr_y(), ultra_coordinate.fsr_angle() * M_PI / 180);
-      coordinate_map_[6] = Point(ultra_coordinate.rsl_x(), ultra_coordinate.rsl_y(), ultra_coordinate.rsl_angle() * M_PI / 180);
+      coordinate_map_[5] = Point3D(ultra_coordinate.fsr_x(), ultra_coordinate.fsr_y(), ultra_coordinate.fsr_angle() * M_PI / 180);
+      coordinate_map_[6] = Point3D(ultra_coordinate.rsl_x(), ultra_coordinate.rsl_y(), ultra_coordinate.rsl_angle() * M_PI / 180);
 
       int dis0 = 6000;
       distances_.emplace_back(dis0);
@@ -35,18 +35,18 @@ class UltrasonicTest : public testing::Test {
     void SetUp(){}
     void TearDown(){}
   public:
-    std::map<int, Point> coordinate_map_;
+    std::map<int, Point3D> coordinate_map_;
     std::vector<int> distances_;
     UltrasonicCoordinate ultra_coordinate;
 };
 
 TEST_F(UltrasonicTest, DirectMeasuredPositionCalculateTest){
-  std::vector<Point> pos;
+  std::vector<Point2D> pos;
   std::vector<Status> sta;
   for(int i = 0; i < 12; ++i){
     Ultrasonic ultra(coordinate_map_[i], distances_[i]);
     ultra.DirectMeasuredPositionCalculate();
-    Point position = ultra.GetPosition();
+    Point2D position = ultra.GetPosition();
     pos.emplace_back(position);
     Status status = ultra.GetStatus();
     sta.emplace_back(status);
@@ -108,13 +108,13 @@ TEST_F(UltrasonicTest, GlobalDirectPositionCalculateTest){
   pose.mutable_position()->set_y(1080 * cos(45 * M_PI / 180));
   pose.set_heading(45 * M_PI / 180);
 
-  std::vector<Point> pos;
+  std::vector<Point2D> pos;
   std::vector<Status> sta;
   for(int i = 0; i < 12; ++i){
     Ultrasonic ultra(coordinate_map_[i], distances_[i]);
     ultra.DirectMeasuredPositionCalculate();
     ultra.GlobalDirectPositionCalculate(pose);
-    Point position_global = ultra.GetGlobalPosition();
+    Point2D position_global = ultra.GetGlobalPosition();
     pos.emplace_back(position_global);
     Status status = ultra.GetStatus();
     sta.emplace_back(status);

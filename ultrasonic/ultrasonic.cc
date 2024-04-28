@@ -21,7 +21,7 @@ void Ultrasonic::GlobalDirectPositionCalculate(const std::shared_ptr<Pose>& pose
   } else {
     point_global_.x = pose->position().x()
           + point_.x * cos(pose->heading()) - point_.y * sin(pose->heading());
-    point_global_.y = pose.position().y()
+    point_global_.y = pose->position().y()
           + point_.x * sin(pose->heading()) + point_.y * cos(pose->heading());
   }
 }

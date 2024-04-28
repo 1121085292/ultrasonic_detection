@@ -14,7 +14,8 @@ cc_library(
     "//ultrasonic_detection/common_msgs:parking_perception_cc_proto",
     "//ultrasonic_detection/ultrasonic:ultrasonic_detection",
     "//ultrasonic_detection/ultrasonic:parking_spot_detection",
-    "//ultrasonic_detection/base:ultrasonic_orientation"
+    "//ultrasonic_detection/base:ultrasonic_orientation",
+    "//ultrasonic_detection/proto:ultrasonic_conf_cc_proto"
   ]
 )
 
