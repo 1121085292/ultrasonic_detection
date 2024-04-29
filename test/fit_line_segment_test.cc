@@ -12,20 +12,19 @@
 using namespace cv;
 using namespace std;
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
-const int MAX_POINTS = 1000;
+const int WIDTH = 1000;
+const int HEIGHT = 1000;
 
 vector<Point2D> generateRandomPoints(int numPoints, double stdDev, double dirX, double dirY)
 {
   vector<Point2D> points;
-  double meanX = WIDTH / 2.0;
-  double meanY = HEIGHT / 2.0;
+  double meanX = 0.0;
+  double meanY = 0.0;
 
   for (int i = 0; i < numPoints; i++)
   {
-    double x = meanX + dirX * i + stdDev * (rand() % 5 + 3.5);
-    double y = meanY + dirY * i + stdDev * (rand() % 5 + 3.5);
+    double x = meanX + dirX * i + stdDev * (rand() % 10 + 3.5);
+    double y = meanY + dirY * i + stdDev * (rand() % 10 + 3.5);
     points.emplace_back(Point2D(x, y));
   }
 
@@ -37,49 +36,50 @@ int main()
   LineFitParams lf;
   lf.min_fit_num = 10;
   lf.min_cluster_size = 5;
-  lf.cluster_dist_threshold = 50;
+  lf.cluster_dist_threshold = 400;
   lf.merge_angle_threshold = 10;
-  lf.merge_dist_threshold = 50;
+  lf.merge_dist_threshold = 100;
 
-  srand(time(0));
-  namedWindow("Line Segment Fitting", WINDOW_AUTOSIZE);
+  srand(time(nullptr));
 
   double stdDev = 10.0;
-  double dirX = 3.0;
-  double dirY = 2.0;
+  double dirX = 50.0;
+  double dirY = 20.0;
 
   vector<Point2D> points;
-  int numPoints = 0;
 
-  while (true)
-  {
-    Mat image(HEIGHT, WIDTH, CV_8UC3, Scalar(0, 0, 0));
+  // while (true)
+  // {
+    Mat image(HEIGHT, WIDTH, CV_8UC3, Scalar(255, 255, 255));
 
-    if (numPoints < MAX_POINTS)
-    {
-      int numNewPoints = rand() % 10 + 1;
-      vector<Point2D> newPoints = generateRandomPoints(numNewPoints, stdDev, dirX, dirY);
-      points.insert(points.end(), newPoints.begin(), newPoints.end());
-      numPoints += numNewPoints;
+    int numNewPoints = rand() % 50 + 10;
+    // 随机点
+    points = generateRandomPoints(numNewPoints, stdDev, dirX, dirY);
+    vector<LineSegment> lineSegments = LineSegment().FitLineSegments(points, lf);
+    // 输出拟合结果
+    cout << lineSegments.size() << endl;
+    for (const auto& seg : lineSegments) {
+      cout << "Line segment: (" << seg.GetStart().x << "," << seg.GetStart().y << ") -> ("
+          << seg.GetEnd().x << "," << seg.GetEnd().y << ")" << endl;
     }
-
+    // 绘制输入点云
     for (const Point2D& p : points)
     {
-      circle(image, Point(p.x, p.y), 2, Scalar(0, 0, 0), -1);
+      circle(image, Point(p.x * 0.5, p.y * 0.5), 2, Scalar(0, 0, 0), -1);
     }
-
-    vector<LineSegment> lineSegments = LineSegment().FitLineSegments(points, lf);
+    // 绘制拟合线段
     for (const LineSegment& ls : lineSegments)
     {
-      line(image, Point(ls.GetStart().x, ls.GetStart().y),
-                  Point(ls.GetEnd().x, ls.GetEnd().y), Scalar(0, 0, 255), 2);
+      line(image, Point(ls.GetStart().x * 0.5, ls.GetStart().y * 0.5),
+                  Point(ls.GetEnd().x * 0.5, ls.GetEnd().y * 0.5), Scalar(0, 0, 255), 2);
     }
-
+    // 显示结果
     imshow("Line Segment Fitting", image);
-    char key = waitKey(30);
-    if (key == 27) // Esc键退出
-      break;
-  }
+    waitKey(0);
+  //   char key = waitKey(30);
+  //   if (key == 27) // Esc键退出
+  //     break;
+  // }
 
   return 0;
 }
