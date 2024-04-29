@@ -150,7 +150,7 @@ void LineSegment::MergeLineSegments(std::vector<LineSegment>& segments) {
         points.push_back(segments[i + 1].end_);
         i++;
       }
-        
+      // 最小二乘法拟合线段
       double min_error = INFINITY;
       LineSegment best_fit;
       for (size_t j = 0; j < points.size() - 1; j++) {
