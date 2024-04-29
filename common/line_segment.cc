@@ -177,3 +177,160 @@ std::vector<LineSegment> LineSegment::MergeLineSegments(const std::vector<LineSe
   }
   return merged;
 }
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+
+using namespace std;
+
+// 点的结构体
+struct Point {
+    double x, y;
+    Point(double x, double y) : x(x), y(y) {}
+};
+
+// 线段的结构体
+struct LineSegment {
+    Point p1, p2;
+    LineSegment(Point p1, Point p2) : p1(p1), p2(p2) {}
+};
+
+// 计算两点距离
+double dist(const Point& p1, const Point& p2) {
+    return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+}
+
+// 计算点到线段的距离
+double pointToLineDistance(const Point& p, const LineSegment& line) {
+    double x1 = line.p1.x, y1 = line.p1.y;
+    double x2 = line.p2.x, y2 = line.p2.y;
+    double x0 = p.x, y0 = p.y;
+    return fabs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1) / sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
+}
+
+// 计算线段与X轴正向的夹角
+double lineAngle(const LineSegment& line) {
+    double dx = line.p2.x - line.p1.x;
+    double dy = line.p2.y - line.p1.y;
+    return atan2(dy, dx);
+}
+
+// 线段拟合函数
+vector<LineSegment> fitLineSegments(const vector<Point>& points, double distThreshold, double angleThreshold) {
+    vector<LineSegment> segments;
+    
+    // 步骤1: 线跟踪分割点簇
+    vector<vector<Point>> clusters;
+    vector<Point> currentCluster;
+    for (int i = 0; i < points.size(); i++) {
+        if (currentCluster.empty() || dist(points[i], currentCluster.back()) < distThreshold) {
+            currentCluster.push_back(points[i]);
+        } else {
+            if (currentCluster.size() > 1) {
+                clusters.push_back(currentCluster);
+            }
+            currentCluster.clear();
+            currentCluster.push_back(points[i]);
+        }
+    }
+    if (!currentCluster.empty()) {
+        clusters.push_back(currentCluster);
+    }
+    
+    // 步骤2: 对每个簇应用改进的IEPF算法
+    for (const auto& cluster : clusters) {
+        if (cluster.size() > 1) {
+            // 初始线段为起点和终点连线
+            LineSegment initialSegment(cluster.front(), cluster.back());
+            segments.push_back(initialSegment);
+            
+            // 递归划分线段
+            vector<LineSegment> dividedSegments = {initialSegment};
+            divideLineSegments(dividedSegments, cluster, distThreshold);
+            
+            // 合并相邻线段
+            mergeLineSegments(dividedSegments, angleThreshold);
+            
+            // 将合并后的线段添加到结果
+            segments.insert(segments.end(), dividedSegments.begin(), dividedSegments.end());
+        }
+    }
+    
+    return segments;
+}
+
+// 递归划分线段
+void divideLineSegments(vector<LineSegment>& segments, const vector<Point>& points, double distThreshold) {
+    vector<LineSegment> newSegments;
+    for (const auto& segment : segments) {
+        double maxDist = 0;
+        int splitIdx = -1;
+        for (int j = 0; j < points.size(); j++) {
+            double dist = pointToLineDistance(points[j], segment);
+            if (dist > maxDist) {
+                maxDist = dist;
+                splitIdx = j;
+            }
+        }
+        
+        if (maxDist > distThreshold && splitIdx != -1) {
+            LineSegment seg1(segment.p1, points[splitIdx]);
+            LineSegment seg2(points[splitIdx], segment.p2);
+            newSegments.push_back(seg1);
+            newSegments.push_back(seg2);
+            
+            vector<Point> points1, points2;
+            for (int j = 0; j < points.size(); j++) {
+                if (j < splitIdx) {
+                    points1.push_back(points[j]);
+                } else if (j > splitIdx) {
+                    points2.push_back(points[j]);
+                }
+            }
+            
+            divideLineSegments(newSegments, points1, distThreshold);
+            divideLineSegments(newSegments, points2, distThreshold);
+        } else {
+            newSegments.push_back(segment);
+        }
+    }
+    
+    segments = newSegments;
+}
+
+// 合并相邻线段
+void mergeLineSegments(vector<LineSegment>& segments, double angleThreshold) {
+    vector<LineSegment> mergedSegments;
+    for (int i = 0; i < segments.size(); i++) {
+        if (i == segments.size() - 1 || fabs(lineAngle(segments[i]) - lineAngle(segments[i + 1])) > angleThreshold) {
+            mergedSegments.push_back(segments[i]);
+        } else {
+            vector<Point> points = {segments[i].p1, segments[i].p2};
+            while (i + 1 < segments.size() && fabs(lineAngle(segments[i]) - lineAngle(segments[i + 1])) <= angleThreshold) {
+                points.push_back(segments[i + 1].p2);
+                i++;
+            }
+            
+            double minError = INFINITY;
+            LineSegment bestFit;
+            for (int j = 0; j < points.size() - 1; j++) {
+                for (int k = j + 1; k < points.size(); k++) {
+                    LineSegment candidate(points[j], points[k]);
+                    double error = 0;
+                    for (const auto& p : points) {
+                        error += pow(pointToLineDistance(p, candidate), 2);
+                    }
+                    if (error < minError) {
+                        minError = error;
+                        bestFit = candidate;
+                    }
+                }
+            }
+            mergedSegments.push_back(bestFit);
+        }
+    }
+    
+    segments = mergedSegments;
+}
