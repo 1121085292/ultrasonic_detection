@@ -39,11 +39,15 @@ class LineSegment {
   private:
     // 对点云进行聚类
     std::vector<Cluster> ClusterPoints(const std::vector<Point2D> &points);
-    // 对点云簇拟合线段
-    LineSegment FitLineSegment(const Cluster& cluster);
+    // 递归划分线段
+    void DivideLineSegments(
+        std::vector<LineSegment>& segments,
+        const std::vector<Point2D>& points);
     // 合并相邻线段
-    std::vector<LineSegment> MergeLineSegments(const std::vector<LineSegment>& segments);
-
+    void MergeLineSegments(std::vector<LineSegment>& segments);
+    // 计算线段与X轴正向的夹角
+    double LineAngle(const LineSegment& line);
+    
     bool is_init_ = false;
     Point2D start_, end_;
     LineFitParams line_fit_params_;

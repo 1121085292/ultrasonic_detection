@@ -29,18 +29,17 @@ std::vector<LineSegment> LineSegment::FitLineSegments(
   for (const auto& cluster : clusters) {
     if (static_cast<int>(cluster.size()) < line_fit_params_.min_cluster_size) continue;
     // 初始线段为起点和终点连线
-    LineSegment initialSegment(cluster.front(), cluster.back());
+    LineSegment initial_segment(cluster.front(), cluster.back());
     
     // 递归划分线段
-    std::vector<LineSegment> dividedSegments = {initialSegment};
-    DivideLineSegments(dividedSegments, cluster);
+    std::vector<LineSegment> divided_segments = {initial_segment};
+    DivideLineSegments(divided_segments, cluster);
     
     // 合并相邻线段
-    MergeLineSegments(dividedSegments);
+    MergeLineSegments(divided_segments);
     
     // 将合并后的线段添加到结果
-    segments.insert(segments.end(), dividedSegments.begin(), dividedSegments.end());
-    
+    segments.insert(segments.end(), divided_segments.begin(), divided_segments.end());
   }
   return segments;
 }

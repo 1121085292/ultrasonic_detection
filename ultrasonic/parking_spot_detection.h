@@ -12,12 +12,6 @@ enum ParkingSpaceType {
   PARALLEL_PARKING = 1
 };
 
-/*    // 线段拟合参数
-    LineFitParams line_fit_params_;
-    // 空间车位识别参数
-    ParkingSpotParams parking_spot_params_;
-    // 路牙识别参数
-    CurbParams curb_params_;*/
 class ParkingSpotDetection {
   public:
     // 空间车位搜索
