@@ -1,0 +1,42 @@
+syntax = "proto2";
+
+package common_msgs.InsLocation;
+
+message InsLocation{
+  optional double vehicleX =1;
+  optional double vehicleY =2;
+  optional double vehicleZ =3;
+  optional double velocityX =4;
+  optional double velocityY =5;
+  optional double gyroscopeZ =6;
+  optional double theta =7;
+  optional double pitch =8;
+  optional double roll =9;
+  optional Header header =10;
+  optional Pose pose =11;
+
+  message Header {
+    // Message publishing time in seconds.
+    optional double timestamp_sec = 1;
+    // Module name.
+    optional string module_name = 2;
+
+    // Sequence number for each message. Each module maintains its own counter for
+    // sequence_num, always starting from 1 on boot.
+    optional uint32 sequence_num = 3;
+  }
+  message Pose {
+    // Position of the vehicle reference point (VRP) in the map reference frame.
+    // The VRP is the center of rear axle.
+    optional PointENU position = 1;
+    // Heading
+    // The heading is zero when the car is facing East and positive when facing
+    // North.
+    optional double heading = 6;
+    message PointENU {
+      optional double x = 1 [default = nan];  // East from the origin, in meters.
+      optional double y = 2 [default = nan];  // North from the origin, in meters.
+      optional double z = 3 [default = 0.0];  // Up from the WGS-84 ellipsoid, in meters.
+    }
+  }
+}

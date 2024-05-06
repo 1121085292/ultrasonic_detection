@@ -41,10 +41,7 @@ class Ultrasonic {
 
     // 全局坐标系下障碍物位置
     void GlobalDirectPositionCalculate(const std::shared_ptr<Pose>& pose);
-
-    // 车位识别
     
-
   private:
     // 探头安装位置
     Point3D coordinate_;
