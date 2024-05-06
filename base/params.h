@@ -1,13 +1,12 @@
 #pragma once
-#include <cmath>
 
 struct MinFilterParams {
   int window_size = 3;
-  int threshold = 300;    //mm
+  int threshold = 20;    //mm
 };
 
 struct UltrasonicParams {
-  int max_range = 6000;
+  int max_range = 5000;
 };
 
 struct LineFitParams {

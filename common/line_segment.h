@@ -12,7 +12,7 @@ class LineSegment {
     LineSegment(){}
     LineSegment(const Point2D& start, const Point2D& end)
       :  start_(start), end_(end) {}
-    // 线的长度
+    // 线段长度
     double Length() const {
       return (end_ - start_).Length();
     }
