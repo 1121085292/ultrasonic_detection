@@ -18,16 +18,18 @@ struct LineFitParams {
 };
 
 struct ParkingSpotParams{
+  // 边界长度阈值
   double line_length_threshold = 2500.0;
   double line_width_threshold = 800.0;
   // 车位长度
   double spot_length_threshold = 5200.0;
   // 车位深度
   double spot_width_threshold = 2500.0;
-
+  // 线段生长阈值
   double grow_line_dist;
   double grow_line_angle;
-  double min_line_distance;
+  // 特征线段长度阈值
+  double min_line_length;
   // 横向偏移
   double offset_threshold;
   // 偏移角度

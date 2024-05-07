@@ -17,7 +17,7 @@ message TargetParkingSpotInfo {
 optional ParkingVertices target_parking_vertices = 1;
   optional bool parking_inwards = 2;
   //optional bool is_right_side =3;
-  optional OtheParkingSpotInfo otherParkingSpotInfo = 3;
+  optional OtherParkingSpotInfo otherParkingSpotInfo = 3;
 }
 
 message OtherParkingSpotInfo {

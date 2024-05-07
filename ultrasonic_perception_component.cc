@@ -42,7 +42,7 @@ bool UltrasonicComponent::Init()
   // Parking Spot
   parking_spot_params_.grow_line_dist = ultra_config.parking_spot_config().grow_line_dist();
   parking_spot_params_.grow_line_angle = ultra_config.parking_spot_config().grow_line_angle();
-  parking_spot_params_.min_line_distance = ultra_config.parking_spot_config().min_line_distance();
+  parking_spot_params_.min_line_length = ultra_config.parking_spot_config().min_line_length();
   parking_spot_params_.offset_threshold = ultra_config.parking_spot_config().offset_threshold();
   parking_spot_params_.angle_threshold = ultra_config.parking_spot_config().angle_threshold();
   // Curb
@@ -141,6 +141,7 @@ bool UltrasonicComponent::Proc(
   // 车位
   std::vector<Point2D> fsl_parking_vertices;
   std::vector<Point2D> fsr_parking_vertices;
+  // TODO：Async？
   for(const auto& pair : global_pos_map){
     if(pair.first == 0){
       parking_spot_detect_ptr_->ParkingSpotSearch(pair.second, pose,
@@ -207,6 +208,10 @@ void UltrasonicComponent::FillParkingSpot(
     const std::vector<Point2D>& parking_vertices,
     std::shared_ptr<UltrasonicList> &out_msg)
 {
+  if(parking_vertices.empty()){
+    AINFO << "No parking Spot";
+    return;
+  }
   std::vector<Point2D> points = parking_vertices;
   auto target_parking_spot_info = out_msg->mutable_target_parking_spot_info();
   auto target_parking_vertices = target_parking_spot_info->mutable_target_parking_vertices();

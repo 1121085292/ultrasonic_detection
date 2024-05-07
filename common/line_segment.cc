@@ -44,13 +44,24 @@ std::vector<LineSegment> LineSegment::FitLineSegments(
   return segments;
 }
 
+double LineSegment::AngleBetweenLines(const LineSegment &line){
+  auto dir1 = GetDirection();
+  auto dir2 = line.GetDirection();
+
+  double dot = dir1.dot(dir2);
+  // 弧长
+  return fabs(acos( dot / (Length() * line.Length())));
+}
+
 double LineSegment::ProjectLength(double heading) const
 {
+  auto line1 = LineSegment(start_, end_);
+  // 单位向量
   Point2D direction(cos(heading), sin(heading));
-  Point2D d = GetDirection();
-  double dp = d.x * direction.x + d.y * direction.y;
-  Point2D proj = direction * dp;
-  return LineSegment(start_, start_ + proj).Length();
+  LineSegment line2(Point2D(0.0, 0.0), direction);
+  // 两线段夹角
+  double angle = line1.AngleBetweenLines(line2);
+  return Length() * angle;
 }
 
 double LineSegment::DistanceToLine(const Point2D &p, const LineSegment &line)

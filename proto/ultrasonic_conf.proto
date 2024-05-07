@@ -70,7 +70,7 @@ message ParkingSpotConfig {
   //  线段生长时角度阈值
   optional double grow_line_angle = 2;
   //  生长时拟合线段的最短长度/mm
-  optional double min_line_distance = 3;
+  optional double min_line_length = 3;
   //  横向偏移
   optional double offset_threshold = 4;
   //  偏移角度

@@ -53,8 +53,6 @@ class ParkingSpotDetection {
         const LineSegment& line, int key, bool flag,
         const ParkingSpotParams& parking_spot_params,
         const std::shared_ptr<Pose>& pose);
-    // 计算两线段夹角
-    double AngleBetweenLines(const LineSegment& line1, const LineSegment& line2);
 
     // 判断是否为路牙特征线段
     bool IsCurbLine(

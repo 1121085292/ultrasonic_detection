@@ -3,6 +3,7 @@ syntax = "proto2";
 package common_msgs.ultrasonic;
 
 import "ultrasonic_detection/common_msgs/error_code.proto";
+import "ultrasonic_detection/common_msgs/parking_perception.proto";
 
 message Point {
   optional double x = 1;

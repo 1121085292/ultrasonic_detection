@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-
+#include <cassert>
 #include "ultrasonic_detection/base/point.h"
 #include "ultrasonic_detection/base/params.h"
 
@@ -32,9 +32,11 @@ class LineSegment {
     std::vector<LineSegment> FitLineSegments(
         const std::vector<Point2D>& points,
         const LineFitParams& line_fit_params);
+    // 计算两线段夹角
+    double AngleBetweenLines(const LineSegment& line);
     // 线段在车辆航向上的投影
     double ProjectLength(double heading) const;
-    // 计算点到线段的距离
+    // 计算点到直线的距离
     double DistanceToLine(const Point2D& p, const LineSegment& line);
   private:
     // 对点云进行聚类

@@ -53,8 +53,8 @@ void ParkingSpotDetection::FindPotentialParkingSpots(
     LineSegment line1 = fit_lines[i];
     const LineSegment& line2 = fit_lines[i + 1];
     // 判断特征线段长度是否满足阈值
-    if (line1.Length() < parking_spot_params.min_line_distance ||
-        line2.Length() < parking_spot_params.min_line_distance) continue;
+    if (line1.Length() < parking_spot_params.min_line_length ||
+        line2.Length() < parking_spot_params.min_line_length) continue;
     // 线段近端点组成新的线段
     LineSegment line(line1.GetEnd(), line2.GetStart());
     // 计算投影长度
@@ -144,7 +144,7 @@ bool ParkingSpotDetection::CheckParkingSpotConstraints(
     offset = std::max(offset, LineSegment().DistanceToLine(line2.GetStart(), line1));
     offset = std::max(offset, LineSegment().DistanceToLine(line2.GetStart(), line1));
     // 偏移角度
-    angle = AngleBetweenLines(line1, line2);
+    angle = line1.AngleBetweenLines(line2);
   }
   if(offset > parking_spot_params.offset_threshold && angle > parking_spot_params.angle_threshold * M_PI / 180){
     return false;
@@ -234,7 +234,7 @@ double ParkingSpotDetection::GrowLineSegment(
       if((line_bak.GetStart() - pre_line.GetEnd()).Length() > parking_spot_params.grow_line_dist){
         return project_length;
       // 判断两条拟合线段夹角是否满足阈值
-      } else if(AngleBetweenLines(line_bak, pre_line) > parking_spot_params.grow_line_dist){
+      } else if(line_bak.AngleBetweenLines(pre_line) > parking_spot_params.grow_line_dist){
         return project_length;
       } else {
         // 生长
@@ -254,7 +254,7 @@ double ParkingSpotDetection::GrowLineSegment(
       if((next_line.GetStart() - line_bak.GetEnd()).Length() > parking_spot_params.grow_line_dist){
         return project_length;
       // 判断两条拟合线段夹角是否满足阈值
-      } else if(AngleBetweenLines(next_line, line_bak) > parking_spot_params.grow_line_angle * M_PI / 180){
+      } else if(next_line.AngleBetweenLines(line_bak) > parking_spot_params.grow_line_angle * M_PI / 180){
         return project_length;
       } else {
         // 生长
@@ -265,16 +265,6 @@ double ParkingSpotDetection::GrowLineSegment(
     }
   }
   // return project_length;
-}
-
-double ParkingSpotDetection::AngleBetweenLines(
-    const LineSegment &line1, const LineSegment &line2){
-  auto dir1 = line1.GetDirection();
-  auto dir2 = line2.GetDirection();
-
-  double dot = dir1.dot(dir2);
-  // 弧长
-  return fabs(acos( dot / (line1.Length() * line2.Length())));
 }
 
 bool ParkingSpotDetection::IsCurbLine(

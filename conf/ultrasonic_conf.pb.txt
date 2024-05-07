@@ -47,7 +47,7 @@ line_fit_config {
 parking_spot_config {
   grow_line_dist: 50
   grow_line_angle: 10
-  min_line_distance: 30
+  min_line_length: 30
   offset_threshold: 300
   angle_threshold: 10
 }
