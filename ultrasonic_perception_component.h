@@ -11,7 +11,7 @@
 #include "ultrasonic_detection/base/ultrasonic_orientation.h"
 #include "ultrasonic_detection/common/min_filter.h"
 
-#define Minfilter 1
+#define Minfilter 0
 
 using apollo::cyber::Component;
 using common_msgs::echo_list::Echo;

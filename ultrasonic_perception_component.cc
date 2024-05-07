@@ -67,15 +67,15 @@ bool UltrasonicComponent::Proc(
     // 遍历添加echo中的距离到容器
     std::vector<int> distances;
     // 如果某个探头故障，默认测距为最大量程
-    if(echo.error_code() != common_msgs::error_code::ErrorCode::OK){
-      AERROR << "No." << sensor_id << " Ultrasonic Error";
-      distances.emplace_back(6000);
-    } else {
-      for(const auto& distance : distances){
+    for(const auto& distance : echo.distances()){
+      if(echo.error_code() != common_msgs::error_code::ErrorCode::OK){
+        AINFO << "No." << sensor_id << " Ultrasonic Error";
+        distances.emplace_back(5000);
+      } else {
         distances.emplace_back(distance);
       }
     }
-#ifdef Minfilter
+#if Minfilter == 1
     // TODO:min_filter?
     std::vector<int> filtered_distances;
     MinFilter min_filter(MinFilterParams().window_size, MinFilterParams().threshold);

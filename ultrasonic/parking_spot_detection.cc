@@ -6,18 +6,19 @@ void ParkingSpotDetection::ParkingSpotSearch(
     const ParkingSpotParams& parking_spot_params,
     const CurbParams& curb_params,
     std::vector<Point2D>& parking_vertices){
-  std::vector<Point2D> points;
-  points.emplace_back(point);
+  points_.emplace_back(point);
   // 当障碍物点集≥10时，才进行特征线段拟合
-  if(static_cast<int>(points.size()) < line_fit_params.min_fit_num){
+  if(static_cast<int>(points_.size()) < line_fit_params.min_fit_num){
     return;
   }
   // 特征线段拟合
   line_segment_ptr_ = std::make_shared<LineSegment>();
-  std::vector<LineSegment> fit_lines = line_segment_ptr_->FitLineSegments(points, line_fit_params);
+  std::vector<LineSegment> fit_lines = line_segment_ptr_->FitLineSegments(points_, line_fit_params);
   // 1.潜在车位搜索
   std::map<int, std::vector<LineSegment>> line_segments;
-  FindPotentialParkingSpots(fit_lines, pose, parking_spot_params, curb_params, line_segments);
+  if(!FindPotentialParkingSpots(fit_lines, pose, parking_spot_params, curb_params, line_segments)){
+    return;
+  }
   // 2.对存在潜在车位的线段对再判断
   for(const auto& pair : line_segments){
     // 满足车位再判断的线段对
@@ -33,12 +34,13 @@ void ParkingSpotDetection::ParkingSpotSearch(
   }
 }
 
-void ParkingSpotDetection::FindPotentialParkingSpots(
+bool ParkingSpotDetection::FindPotentialParkingSpots(
     const std::vector<LineSegment> &fit_lines,
     const std::shared_ptr<Pose> &pose,
     const ParkingSpotParams& parking_spot_params,
     const CurbParams& curb_params,
     std::map<int, std::vector<LineSegment>>& line_segments){
+  if(fit_lines.empty()) return false;
   // 筛选出路牙线段和障碍物线段
   for (size_t i = 0; i < fit_lines.size() - 1; ++i) {
     const LineSegment& line = fit_lines[i];
@@ -72,8 +74,10 @@ void ParkingSpotDetection::FindPotentialParkingSpots(
       // } else {
       //   parking_space_type_ = ParkingSpaceType::VERTICAL_PLOT;
       // }
+      return true;
     }
   }
+  return false;
 }
 
 // 对存在潜在车位的线段对再判断

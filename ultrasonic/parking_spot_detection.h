@@ -28,7 +28,7 @@ class ParkingSpotDetection {
         
   private:
     // 潜在车位搜索
-    void FindPotentialParkingSpots(
+    bool FindPotentialParkingSpots(
         const std::vector<LineSegment> &fit_lines,
         const std::shared_ptr<Pose> &pose,
         const ParkingSpotParams& parking_spot_params,
@@ -62,6 +62,9 @@ class ParkingSpotDetection {
 
     // 匹配线段对
     std::vector<LineSegment> parking_spot_;
+
+    // 障碍物点集
+    std::vector<Point2D> points_;
 
     std::shared_ptr<LineSegment> line_segment_ptr_;
     std::vector<LineSegment> fit_lines_;
