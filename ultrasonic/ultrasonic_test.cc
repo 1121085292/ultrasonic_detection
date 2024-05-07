@@ -1,5 +1,5 @@
 #include "ultrasonic.h"
-#include "ultrasonic_detection/proto/ultrasonic_coordinate.pb.h"
+#include "ultrasonic_detection/proto/ultrasonic_conf.pb.h"
 
 #include "gtest/gtest.h"
 
@@ -25,7 +25,7 @@ class UltrasonicTest : public testing::Test {
       coordinate_map_[5] = Point3D(ultra_coordinate.fsr_x(), ultra_coordinate.fsr_y(), ultra_coordinate.fsr_angle() * M_PI / 180);
       coordinate_map_[6] = Point3D(ultra_coordinate.rsl_x(), ultra_coordinate.rsl_y(), ultra_coordinate.rsl_angle() * M_PI / 180);
 
-      int dis0 = 6000;
+      int dis0 = 5000;
       distances_.emplace_back(dis0);
       for(int i = 1; i < 12; ++i){
         distances_.emplace_back(1000);
@@ -103,10 +103,10 @@ TEST_F(UltrasonicTest, DirectMeasuredPositionCalculateTest){
 }
 
 TEST_F(UltrasonicTest, GlobalDirectPositionCalculateTest){
-  Pose pose;
-  pose.mutable_position()->set_x(1080 * sin(45 * M_PI / 180));
-  pose.mutable_position()->set_y(1080 * cos(45 * M_PI / 180));
-  pose.set_heading(45 * M_PI / 180);
+  auto pose = std::make_shared<Pose>();
+  pose->mutable_position()->set_x(1080 * sin(45 * M_PI / 180));
+  pose->mutable_position()->set_y(1080 * cos(45 * M_PI / 180));
+  pose->set_heading(45 * M_PI / 180);
 
   std::vector<Point2D> pos;
   std::vector<Status> sta;

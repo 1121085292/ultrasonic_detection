@@ -17,6 +17,7 @@ cc_test(
   srcs = ["ultrasonic_detection_test.cc"],
   deps = [
     ":ultrasonic_detection",
+    "//ultrasonic_detection/proto:ultrasonic_conf_cc_proto",
     "@com_google_googletest//:gtest_main"
   ]
 )
@@ -39,6 +40,7 @@ cc_test(
   srcs = ["ultrasonic_test.cc"],
   deps = [
     ":ultrasonic",
+    "//ultrasonic_detection/proto:ultrasonic_conf_cc_proto",
     "@com_google_googletest//:gtest_main"
   ]
 )

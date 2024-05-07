@@ -1,5 +1,5 @@
 #include "ultrasonic_detection.h"
-#include "ultrasonic_detection/proto/ultrasonic_coordinate.pb.h"
+#include "ultrasonic_detection/proto/ultrasonic_conf.pb.h"
 
 #include "gtest/gtest.h"
 
@@ -25,8 +25,8 @@ class UltrasonicDetectionTest : public testing::Test {
       coordinate_map_[5] = Point3D(ultra_coordinate.fsr_x(), ultra_coordinate.fsr_y(), ultra_coordinate.fsr_angle() * M_PI / 180);
       coordinate_map_[6] = Point3D(ultra_coordinate.rsl_x(), ultra_coordinate.rsl_y(), ultra_coordinate.rsl_angle() * M_PI / 180);
 
-      int dis0 = 6000;
-      int dis1 = 6000;
+      int dis0 = 5000;
+      int dis1 = 5000;
       distances_.emplace_back(dis0);
       distances_.emplace_back(dis1);
       for(int i = 2; i < 12; ++i){
