@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-#include <cassert>
+
 #include "ultrasonic_detection/base/point.h"
 #include "ultrasonic_detection/base/params.h"
 

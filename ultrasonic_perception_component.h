@@ -1,5 +1,4 @@
 #pragma once
-#include <queue>
 
 #include "cyber/cyber.h"
 #include "ultrasonic_detection/common_msgs/echo_list.pb.h"
