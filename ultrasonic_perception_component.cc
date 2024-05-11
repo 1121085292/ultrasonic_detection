@@ -146,11 +146,24 @@ bool UltrasonicComponent::Proc(
     if(pair.first == 0){
       parking_spot_detect_ptr_->ParkingSpotSearch(pair.second, pose,
               line_fit_params_, parking_spot_params_, curb_params_, fsl_parking_vertices);
+      if(!fsl_parking_vertices.empty()){
+        spots_[spot_id_] = fsl_parking_vertices;
+        spot_id_++;
+      }
     }
     if(pair.first == 5){
       parking_spot_detect_ptr_->ParkingSpotSearch(pair.second, pose,
               line_fit_params_, parking_spot_params_, curb_params_, fsr_parking_vertices);
+      if(!fsr_parking_vertices.empty()){
+        spots_[spot_id_] = fsr_parking_vertices;
+        spot_id_++;
+      }
     }
+  }
+  // 未找到空间车位
+  if(spots_.empty()){
+    AINFO << "No parking Spots";
+    return false;
   }
 
   // 组织数据
@@ -166,8 +179,12 @@ bool UltrasonicComponent::Proc(
     ultrasonic_list->set_error_code(common_msgs::error_code::ErrorCode::PERCEPTION_ERROR);
   }
   // 空间车位信息
-  FillParkingSpot(fsr_parking_vertices, ultrasonic_list);
+  FillParkingSpots(spots_, ultrasonic_list);
+  // 目标车位
+  auto spot = spots_[FLAGS_spot_id];
+  PublishTargetParkingSpot(spot, ultrasonic_list);
   // 发布
+  AINFO << ultrasonic_list->target_parking_spot_info().DebugString();
   ultrasonic_writer_->Write(ultrasonic_list);
   return true;
 }
@@ -204,15 +221,35 @@ void UltrasonicComponent::FillUltraObject(
   }
 }
 
-void UltrasonicComponent::FillParkingSpot(
-    const std::vector<Point2D>& parking_vertices,
-    std::shared_ptr<UltrasonicList> &out_msg)
+void UltrasonicComponent::FillParkingSpots(
+    const std::map<size_t, std::vector<Point2D>>& spots,
+    std::shared_ptr<UltrasonicList>& out_msg)
 {
-  if(parking_vertices.empty()){
-    AINFO << "No parking Spot";
-    return;
+  auto target_parking_spot_info = out_msg->mutable_target_parking_spot_info();
+  auto otherParkingSpotInfo = target_parking_spot_info->mutable_otherparkingspotinfo();
+  for(const auto& parking_vertices : spots){
+    std::vector<Point2D> points = parking_vertices.second;
+    auto target_parking_vertices = otherParkingSpotInfo->add_other_parking_vertices();
+    // 0号点
+    target_parking_vertices->set_spot_right_top_x(points[0].x);
+    target_parking_vertices->set_spot_right_top_y(points[0].y);
+    // 1号点
+    target_parking_vertices->set_spot_left_top_x(points[1].x);
+    target_parking_vertices->set_spot_left_top_y(points[1].y);
+    // 2号点
+    target_parking_vertices->set_spot_left_down_x(points[2].x);
+    target_parking_vertices->set_spot_left_down_y(points[2].y);
+    // 3号点
+    target_parking_vertices->set_spot_right_down_x(points[3].x);
+    target_parking_vertices->set_spot_right_down_y(points[3].y);
   }
-  std::vector<Point2D> points = parking_vertices;
+}
+
+void UltrasonicComponent::PublishTargetParkingSpot(
+    const std::vector<Point2D>& spot,
+    std::shared_ptr<UltrasonicList>& out_msg)
+{
+  std::vector<Point2D> points = spot;
   auto target_parking_spot_info = out_msg->mutable_target_parking_spot_info();
   auto target_parking_vertices = target_parking_spot_info->mutable_target_parking_vertices();
   // 0号点

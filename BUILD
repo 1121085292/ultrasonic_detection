@@ -16,6 +16,7 @@ cc_library(
         "//ultrasonic_detection/ultrasonic:parking_spot_detection",
         "//ultrasonic_detection/ultrasonic:ultrasonic_detection",
         "//ultrasonic_detection/common:min_filter",
+        "//ultrasonic_detection/common:parking_spot_gflags",
     ],
     alwayslink = True,
 )

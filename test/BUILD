@@ -11,3 +11,13 @@ cc_binary(
     "@opencv//:highgui"
   ]
 )
+
+cc_binary(
+  name = "parking_spot_test",
+  srcs = ["parking_spot_test.cc"],
+  deps = [
+    "//ultrasonic_detection/base:point",
+    "@opencv//:core",
+    "@opencv//:highgui"
+  ]
+)

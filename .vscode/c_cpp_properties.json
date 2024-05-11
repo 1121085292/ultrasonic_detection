@@ -3,7 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "U:/Users/Enlink/Downloads/mingw64/include"
             ],
             "defines": [
                 "_DEBUG",
@@ -11,7 +12,7 @@
                 "_UNICODE"
             ],
             "compilerPath": "U:/Users/Enlink/Downloads/mingw64/bin/g++.exe",
-            "cppStandard": "c++11"
+            "cppStandard": "c++17"
         }
     ],
     "version": 4

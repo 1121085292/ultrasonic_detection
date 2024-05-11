@@ -10,6 +10,9 @@
 #include "ultrasonic_detection/base/ultrasonic_orientation.h"
 #include "ultrasonic_detection/common/min_filter.h"
 
+
+#include "ultrasonic_detection/common/parking_spot_gflags.h"
+
 #define Minfilter 0
 
 using apollo::cyber::Component;
@@ -31,8 +34,11 @@ class UltrasonicComponent : public Component<EchoList, InsLocation>{
     void FillUltraObject(const std::map<int, Point2D> &points_map,
                         const std::map<int, Point2D> &global_pos_map,
                         std::shared_ptr<UltrasonicList>& out_msg);
-    void FillParkingSpot(const std::vector<Point2D>& parking_vertices,
-                        std::shared_ptr<UltrasonicList>& out_msg);
+    void FillParkingSpots(const std::map<size_t, std::vector<Point2D>>& spots,
+                          std::shared_ptr<UltrasonicList>& out_msg);
+
+    void PublishTargetParkingSpot(const std::vector<Point2D>& spot,
+                                  std::shared_ptr<UltrasonicList>& out_msg);
     std::map<int, Echo> echo_map_;         // 探头id ：echo
 
     bool use_triangle_measured_ = false;
@@ -51,6 +57,9 @@ class UltrasonicComponent : public Component<EchoList, InsLocation>{
     CurbParams curb_params_;
     // 空间车位识别
     std::shared_ptr<ParkingSpotDetection> parking_spot_detect_ptr_;
-
+    // 空间车位
+    std::map<size_t, std::vector<Point2D>> spots_;
+    // 车位id
+    size_t spot_id_ = 0;
 };
 CYBER_REGISTER_COMPONENT(UltrasonicComponent);

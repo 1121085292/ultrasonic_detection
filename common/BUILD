@@ -27,3 +27,12 @@ cc_test(
     "@com_google_googletest//:gtest_main"
   ]
 )
+
+cc_library(
+  name = "parking_spot_gflags",
+  hdrs = ["parking_spot_gflags.h"],
+  srcs = ["parking_spot_gflags.cc"],
+  deps = [
+    "@com_github_gflags_gflags//:gflags"
+  ]
+)

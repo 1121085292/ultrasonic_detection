@@ -6,6 +6,7 @@ module_config {
     config {
       name: "UltrasonicComponent"
       config_file_path :"../ultrasonic_detection/conf/ultrasonic_conf.pb.txt"
+      flag_file_path: "../ultrasonic_detection/conf/parking_spot.conf"
       readers {
         channel: "echo_list"
       },
