@@ -10,8 +10,8 @@ cc_library(
         "//cyber",
         "//ultrasonic_detection/base:ultrasonic_orientation",
         "//ultrasonic_detection/common_msgs:echo_list_cc_proto",
-        "//ultrasonic_detection/common_msgs:parking_perception_cc_proto",
         "//ultrasonic_detection/common_msgs:ultrasonic_cc_proto",
+        "//ultrasonic_detection/common_msgs:hmi_cc_proto", 
         "//ultrasonic_detection/proto:ultrasonic_conf_cc_proto",
         "//ultrasonic_detection/ultrasonic:parking_spot_detection",
         "//ultrasonic_detection/ultrasonic:ultrasonic_detection",
@@ -27,5 +27,16 @@ cc_binary(
     linkstatic = True,
     deps = [
         ":ultrasonic_perception_lib",
+    ],
+)
+
+cc_binary(
+    name = "parking_spot",
+    srcs = ["main.cc"],
+    copts = [
+        "-Iexternal/qt",
+    ],
+    deps = [
+      "//ultrasonic_detection/ui:ui"
     ],
 )

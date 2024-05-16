@@ -4,13 +4,11 @@
 #include "cyber/cyber.h"
 #include "ultrasonic_detection/common/line_segment.h"
 #include "ultrasonic_detection/common_msgs/InsLocation.pb.h"
+#include "ultrasonic_detection/common_msgs/parking_perception.pb.h"
 
 using Pose = common_msgs::InsLocation::InsLocation_Pose;
-
-enum ParkingSpaceType {
-  VERTICAL_PLOT = 0,
-  PARALLEL_PARKING = 1
-};
+using common_msgs::parking::proto::ParkingSpotType;
+using common_msgs::parking::proto::ParkingSpot;
 
 class ParkingSpotDetection {
   public:
@@ -20,9 +18,9 @@ class ParkingSpotDetection {
         const LineFitParams& line_fit_params,
         const ParkingSpotParams& parking_spot_params,
         const CurbParams& curb_params,
-        std::vector<Point2D>& parking_vertices);
+        ParkingSpot& parking_spot);
     // 车位类别
-    ParkingSpaceType GetParkingSpaceType() { return parking_space_type_; }
+    ParkingSpotType GetParkingSpotType() { return parking_spot_type_; }
     // 车位位姿计算
     double CalculateParkingSpotAngle(const std::shared_ptr<Pose> &pose);
         
@@ -47,7 +45,7 @@ class ParkingSpotDetection {
       const ParkingSpotParams& parking_spot_params);
 
     // 车位角点计算
-    void CalculateParkingVertices(double angle, std::vector<Point2D>& parking_vertices);
+    void CalculateParkingVertices(double angle, ParkingSpot& parking_spot);
     // 生长线段
     double GrowLineSegment(
         const LineSegment& line, int key, bool flag,
@@ -61,7 +59,7 @@ class ParkingSpotDetection {
         const std::shared_ptr<Pose>& pose);
 
     // 匹配线段对
-    std::vector<LineSegment> parking_spot_;
+    std::vector<LineSegment> parking_spot_pair_;
 
     // 障碍物点集
     std::vector<Point2D> points_;
@@ -69,5 +67,5 @@ class ParkingSpotDetection {
     std::shared_ptr<LineSegment> line_segment_ptr_;
     std::vector<LineSegment> fit_lines_;
     std::vector<LineSegment> curb_lines_;
-    ParkingSpaceType parking_space_type_;
+    ParkingSpotType parking_spot_type_;
 };

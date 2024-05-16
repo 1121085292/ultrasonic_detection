@@ -5,7 +5,7 @@ void ParkingSpotDetection::ParkingSpotSearch(
     const LineFitParams& line_fit_params,
     const ParkingSpotParams& parking_spot_params,
     const CurbParams& curb_params,
-    std::vector<Point2D>& parking_vertices){
+    ParkingSpot& parking_spot){
   points_.emplace_back(point);
   // 当障碍物点集≥10时，才进行特征线段拟合
   if(static_cast<int>(points_.size()) < line_fit_params.min_fit_num){
@@ -30,7 +30,7 @@ void ParkingSpotDetection::ParkingSpotSearch(
     // 4.车位位姿计算
     double angle = CalculateParkingSpotAngle(pose);
     // 5.泊车位角点计算
-    CalculateParkingVertices(angle, parking_vertices);
+    CalculateParkingVertices(angle, parking_spot);
   }
 }
 
@@ -70,9 +70,9 @@ bool ParkingSpotDetection::FindPotentialParkingSpots(
       line_segments[i] = lines;
       // 无路牙时不成立
       // if(curb_lines_map_.find(i + 1) != curb_lines_map_.end()){
-      //   parking_space_type_ = ParkingSpaceType::PARALLEL_PARKING;
+      //   parking_spot_type_ = ParkingSpotType::PARALLEL_PARKING;
       // } else {
-      //   parking_space_type_ = ParkingSpaceType::VERTICAL_PLOT;
+      //   parking_spot_type_ = ParkingSpotType::VERTICAL_PLOT;
       // }
       return true;
     }
@@ -97,16 +97,16 @@ bool ParkingSpotDetection::ReEvaluateParallelParkingSpot(
   // 判断投影长度是否大于长度阈值
   if(proj_length1 > ParkingSpotParams().line_length_threshold &&
      proj_length2 > ParkingSpotParams().line_length_threshold){
-    parking_space_type_ = ParkingSpaceType::PARALLEL_PARKING;
-    parking_spot_.emplace_back(line1);
-    parking_spot_.emplace_back(line2);
+    parking_spot_type_ = ParkingSpotType::PARALLEL_PARKING;
+    parking_spot_pair_.emplace_back(line1);
+    parking_spot_pair_.emplace_back(line2);
     return true;
   // 判断投影长度是否大于宽度阈值
   } else if(proj_length1 > ParkingSpotParams().line_width_threshold &&
             proj_length2 > ParkingSpotParams().line_width_threshold){
-    parking_space_type_ = ParkingSpaceType::VERTICAL_PLOT;
-    parking_spot_.emplace_back(line1);
-    parking_spot_.emplace_back(line2);
+    parking_spot_type_ = ParkingSpotType::VERTICAL_PLOT;
+    parking_spot_pair_.emplace_back(line1);
+    parking_spot_pair_.emplace_back(line2);
     return true;
   }
 
@@ -117,11 +117,11 @@ bool ParkingSpotDetection::ReEvaluateParallelParkingSpot(
 bool ParkingSpotDetection::CheckParkingSpotConstraints(
     const std::shared_ptr<Pose>& pose,
     const ParkingSpotParams& parking_spot_params){
-  if(parking_spot_.empty()){
+  if(parking_spot_pair_.empty()){
     return false;
   }
-  LineSegment line1 = parking_spot_[0];
-  LineSegment line2 = parking_spot_[1];
+  LineSegment line1 = parking_spot_pair_[0];
+  LineSegment line2 = parking_spot_pair_[1];
 
   // 车位深度
   double depth = 0.0;
@@ -153,12 +153,12 @@ bool ParkingSpotDetection::CheckParkingSpotConstraints(
   if(offset > parking_spot_params.offset_threshold && angle > parking_spot_params.angle_threshold * M_PI / 180){
     return false;
   }
-  if(parking_space_type_ == ParkingSpaceType::PARALLEL_PARKING){
+  if(parking_spot_type_ == ParkingSpotType::PARALLEL_PARKING){
     if(depth < ParkingSpotParams().spot_width_threshold &&
        length < ParkingSpotParams().spot_length_threshold){
       return true;
     }
-  } else if(parking_space_type_ == ParkingSpaceType::VERTICAL_PLOT){
+  } else if(parking_spot_type_ == ParkingSpotType::VERTICAL_PLOT){
     if(depth < ParkingSpotParams().spot_length_threshold &&
        length < ParkingSpotParams().spot_width_threshold){
       return true;
@@ -174,39 +174,39 @@ double ParkingSpotDetection::CalculateParkingSpotAngle(const std::shared_ptr<Pos
     return atan2(dir.y, dir.x);
   } else {
     // 用特征线段
-    Point2D dir1 = parking_spot_[0].GetDirection();
-    Point2D dir2 = parking_spot_[1].GetDirection();
+    Point2D dir1 = parking_spot_pair_[0].GetDirection();
+    Point2D dir2 = parking_spot_pair_[1].GetDirection();
     return (atan2(dir1.y, dir1.x) + atan2(dir2.y, dir2.x)) / 2;
   }
   return pose->heading();
 }
 
 void ParkingSpotDetection::CalculateParkingVertices(
-    double angle, std::vector<Point2D> &parking_vertices)
+    double angle, ParkingSpot& parking_spot)
 {
   // 方向向量
   Point2D dir(cos(angle), sin(angle));
   // top->down向量
   Point2D top_down_dir(-sin(angle), cos(angle));
   // 边缘线段在方向向量上投影距离
-  LineSegment line(parking_spot_[0].GetEnd(), parking_spot_[1].GetStart());
+  LineSegment line(parking_spot_pair_[0].GetEnd(), parking_spot_pair_[1].GetStart());
   double proj_dist = line.ProjectLength(angle);
   // 角点
   Point2D spot_left_top, spot_left_down, spot_right_top, spot_right_down;
-  if(parking_space_type_ == ParkingSpaceType::PARALLEL_PARKING){
+  if(parking_spot_type_ == ParkingSpotType::PARALLEL_PARKING){
     // 1号点以line1的终点为基准+delta
     double delta = (proj_dist - ParkingSpotParams().spot_length_threshold) / 2;
-    spot_left_top = parking_spot_[0].GetEnd() + dir * delta;
+    spot_left_top = parking_spot_pair_[0].GetEnd() + dir * delta;
     // 0号点
     spot_right_top = spot_left_top + dir * ParkingSpotParams().spot_length_threshold;
     // 2号点
     spot_left_down = spot_left_top + top_down_dir * ParkingSpotParams().spot_width_threshold;
     // 3号点
     spot_right_down = spot_right_top + top_down_dir * ParkingSpotParams().spot_width_threshold;
-  } else if(parking_space_type_ == ParkingSpaceType::VERTICAL_PLOT){
+  } else if(parking_spot_type_ == ParkingSpotType::VERTICAL_PLOT){
     // 1号点以line1的终点为基准+delta
     double delta = (proj_dist - ParkingSpotParams().spot_width_threshold) / 2;
-    spot_left_top = parking_spot_[0].GetEnd() + dir * delta;
+    spot_left_top = parking_spot_pair_[0].GetEnd() + dir * delta;
     // 0号点
     spot_right_top = spot_left_top + dir * ParkingSpotParams().spot_width_threshold;
     // 2号点
@@ -214,10 +214,19 @@ void ParkingSpotDetection::CalculateParkingVertices(
     // 3号点
     spot_right_down = spot_right_top + top_down_dir * ParkingSpotParams().spot_length_threshold;
   }
-  parking_vertices.emplace_back(spot_right_top);
-  parking_vertices.emplace_back(spot_left_top);
-  parking_vertices.emplace_back(spot_left_down);
-  parking_vertices.emplace_back(spot_right_down);
+  parking_spot.set_spot_left_top_x(spot_left_top.x);
+  parking_spot.set_spot_left_top_y(spot_left_top.y);
+
+  parking_spot.set_spot_left_down_x(spot_left_down.x);
+  parking_spot.set_spot_left_down_y(spot_left_down.y);
+
+  parking_spot.set_spot_right_down_x(spot_right_down.x);
+  parking_spot.set_spot_right_down_y(spot_right_down.y);
+
+  parking_spot.set_spot_right_top_x(spot_right_top.x);
+  parking_spot.set_spot_right_top_y(spot_right_top.x);
+
+  parking_spot.set_spot_type(parking_spot_type_);
 }
 
 double ParkingSpotDetection::GrowLineSegment(

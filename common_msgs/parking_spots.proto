@@ -1,0 +1,33 @@
+syntax="proto2";
+
+package common_msgs.parking.proto;
+
+import "ultrasonic_detection/common_msgs/hmi.proto";
+
+enum ParkingSpotType {
+  VERTICAL_PLOT = 0;
+  PARALLEL_PARKING = 1;
+}
+
+message ParkingSpot {
+  optional double spot_left_top_x = 1;
+  optional double spot_left_top_y = 2;
+  optional double spot_left_down_x = 3;
+  optional double spot_left_down_y = 4;
+  optional double spot_right_down_x = 5;
+  optional double spot_right_down_y = 6;
+  optional double spot_right_top_x = 7;
+  optional double spot_right_top_y = 8;
+
+  optional ParkingSpotType spot_type = 9;
+}
+
+message TargetParkingSpotInfo {
+  optional ParkingSpot target_parking_spot = 1;
+  optional common_msgs.hmi.HMI hmi = 2;
+}
+
+message ParkingSpotsInfo {
+  optional uint32 spots_cnt = 1 ;
+  repeated ParkingSpot parking_spots = 2;
+}

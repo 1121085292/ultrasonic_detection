@@ -28,3 +28,13 @@ cc_binary(
     ":talker_location"
   ]
 )
+
+cc_binary(
+  name = "ui_test",
+  srcs = ["ui_test.cc"],
+  deps = [
+    "//cyber",
+    "//ultrasonic_detection/common_msgs:ultrasonic_cc_proto",
+    "//ultrasonic_detection/common_msgs:parking_perception_cc_proto",
+  ]
+)

@@ -47,5 +47,5 @@ message UltrasonicList {
   // 错误码
   optional common_msgs.error_code.ErrorCode error_code = 3;
   // 空间车位
-  optional apollo.parking.proto.TargetParkingSpotInfo target_parking_spot_info = 4;
+  optional common_msgs.parking.proto.ParkingSpotsInfo parking_spots_info = 4;
 }

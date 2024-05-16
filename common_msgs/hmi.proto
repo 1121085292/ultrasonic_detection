@@ -1,0 +1,9 @@
+syntax="proto2";
+
+package common_msgs.hmi;
+
+
+message HMI {
+  optional uint32 spot_id = 1;
+  optional bool parking_inwards = 2;
+}

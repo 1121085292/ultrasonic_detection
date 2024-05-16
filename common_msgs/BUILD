@@ -24,7 +24,10 @@ cc_proto_library(
 
 proto_library(
   name = "parking_perception_proto",
-  srcs = ["parking_perception.proto"]
+  srcs = ["parking_perception.proto"],
+  deps = [
+    ":hmi_proto"
+  ]
 )
 
 cc_proto_library(
@@ -68,4 +71,16 @@ proto_library(
     ":error_code_proto",
     ":parking_perception_proto"
   ]
+)
+
+cc_proto_library(
+  name = "hmi_cc_proto",
+  deps = [
+      ":hmi_proto",
+  ],
+)
+
+proto_library(
+  name = "hmi_proto",
+  srcs = ["hmi.proto"],
 )

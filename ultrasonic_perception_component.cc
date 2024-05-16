@@ -3,8 +3,7 @@
 
 using Clock = apollo::cyber::Clock;
 
-bool UltrasonicComponent::Init()
-{
+bool UltrasonicComponent::Init() {
   // 导入超声波雷达检测配置文件
   UltrasonicConfig ultra_config;
   if(!apollo::cyber::common::GetProtoFromFile(config_file_path_, &ultra_config)){
@@ -52,7 +51,10 @@ bool UltrasonicComponent::Init()
   // 空间车位识别
   parking_spot_detect_ptr_ = std::make_shared<ParkingSpotDetection>();
   // init ultrasonic writer channel
-  ultrasonic_writer_ = node_->CreateWriter<UltrasonicList>("perception/ultrasonic");
+  ultrasonic_writer_ = node_->CreateWriter<UltrasonicList>("perception/ultrasonic/");
+  target_spot_writer_ = node_->CreateWriter<TargetParkingSpotInfo>("perception/ultrasonic/parkingSpot/");
+  hmi_reader_ = node_->CreateReader<HMI>("hmi/");
+
   return true;
 }
 
@@ -139,23 +141,23 @@ bool UltrasonicComponent::Proc(
   * 存储10帧障碍物位置后，拟合边界线段，对满足要求的线段对进行生长再判断
   */
   // 车位
-  std::vector<Point2D> fsl_parking_vertices;
-  std::vector<Point2D> fsr_parking_vertices;
+  ParkingSpot fsl_parking_spots;
+  ParkingSpot fsr_parking_spots;
   // TODO：Async？
   for(const auto& pair : global_pos_map){
     if(pair.first == 0){
       parking_spot_detect_ptr_->ParkingSpotSearch(pair.second, pose,
-              line_fit_params_, parking_spot_params_, curb_params_, fsl_parking_vertices);
-      if(!fsl_parking_vertices.empty()){
-        spots_[spot_id_] = fsl_parking_vertices;
+              line_fit_params_, parking_spot_params_, curb_params_, fsl_parking_spots);
+      if(fsl_parking_spots.has_spot_type()){
+        spots_[spot_id_] = fsl_parking_spots;
         spot_id_++;
       }
     }
     if(pair.first == 5){
       parking_spot_detect_ptr_->ParkingSpotSearch(pair.second, pose,
-              line_fit_params_, parking_spot_params_, curb_params_, fsr_parking_vertices);
-      if(!fsr_parking_vertices.empty()){
-        spots_[spot_id_] = fsr_parking_vertices;
+              line_fit_params_, parking_spot_params_, curb_params_, fsr_parking_spots);
+      if(fsr_parking_spots.has_spot_type()){
+        spots_[spot_id_] = fsr_parking_spots;
         spot_id_++;
       }
     }
@@ -180,20 +182,32 @@ bool UltrasonicComponent::Proc(
   }
   // 空间车位信息
   FillParkingSpots(spots_, ultrasonic_list);
-  // 目标车位
-  auto spot = spots_[FLAGS_spot_id];
-  PublishTargetParkingSpot(spot, ultrasonic_list);
-  // 发布
-  AINFO << ultrasonic_list->target_parking_spot_info().DebugString();
+  // 发布空间车位
+  AINFO << ultrasonic_list->parking_spots_info().DebugString();
   ultrasonic_writer_->Write(ultrasonic_list);
+  // 目标车位：从GUI界面获取用户选择的车位信息和车头朝向
+  hmi_reader_->Observe();
+  auto hmi_msg = hmi_reader_->GetLatestObserved();
+  if(hmi_msg == nullptr){
+    AINFO << "No message in 'hmi/' channel";
+  } else {
+    ADEBUG << "HMI: " << hmi_msg->DebugString();
+  }
+  auto spot = spots_[hmi_msg->spot_id()];
+  bool parking_inwards = hmi_msg->parking_inwards();
+  // 发布目标车位
+  if(spot.has_spot_type()){
+    auto target_spot = std::make_shared<TargetParkingSpotInfo>();
+    PublishTargetParkingSpot(spot, parking_inwards, hmi_msg->spot_id(), target_spot);
+    target_spot_writer_->Write(target_spot);
+  }
   return true;
 }
 
 void UltrasonicComponent::FillUltraObject(
-    const std::map<int, Point2D> &points_map,
-    const std::map<int, Point2D> &global_pos_map,
-    std::shared_ptr<UltrasonicList>& out_msg){
-  
+    const std::map<int, Point2D>& points_map,
+    const std::map<int, Point2D>& global_pos_map,
+    std::shared_ptr<UltrasonicList>& out_msg) {
   auto tmp_map1 = points_map;
   auto tmp_map2 = global_pos_map;
   for(size_t sensor_id = 0; sensor_id < points_map.size(); ++sensor_id){
@@ -222,46 +236,29 @@ void UltrasonicComponent::FillUltraObject(
 }
 
 void UltrasonicComponent::FillParkingSpots(
-    const std::map<size_t, std::vector<Point2D>>& spots,
+    const std::map<size_t, ParkingSpot>& spots,
     std::shared_ptr<UltrasonicList>& out_msg)
 {
-  auto target_parking_spot_info = out_msg->mutable_target_parking_spot_info();
-  auto otherParkingSpotInfo = target_parking_spot_info->mutable_otherparkingspotinfo();
-  for(const auto& parking_vertices : spots){
-    std::vector<Point2D> points = parking_vertices.second;
-    auto target_parking_vertices = otherParkingSpotInfo->add_other_parking_vertices();
-    // 0号点
-    target_parking_vertices->set_spot_right_top_x(points[0].x);
-    target_parking_vertices->set_spot_right_top_y(points[0].y);
-    // 1号点
-    target_parking_vertices->set_spot_left_top_x(points[1].x);
-    target_parking_vertices->set_spot_left_top_y(points[1].y);
-    // 2号点
-    target_parking_vertices->set_spot_left_down_x(points[2].x);
-    target_parking_vertices->set_spot_left_down_y(points[2].y);
-    // 3号点
-    target_parking_vertices->set_spot_right_down_x(points[3].x);
-    target_parking_vertices->set_spot_right_down_y(points[3].y);
+  auto parking_spots_info = out_msg->mutable_parking_spots_info();
+  for(const auto& pair : spots){
+    auto spot = parking_spots_info->add_parking_spots();
+    spot->CopyFrom(pair.second);
   }
+  // 车位数量
+  parking_spots_info->set_spots_cnt(spot_id_);
 }
 
 void UltrasonicComponent::PublishTargetParkingSpot(
-    const std::vector<Point2D>& spot,
-    std::shared_ptr<UltrasonicList>& out_msg)
+    const ParkingSpot& spot,
+    bool parking_inwards, 
+    size_t spot_id,
+    std::shared_ptr<TargetParkingSpotInfo>& out_msg)
 {
-  std::vector<Point2D> points = spot;
-  auto target_parking_spot_info = out_msg->mutable_target_parking_spot_info();
-  auto target_parking_vertices = target_parking_spot_info->mutable_target_parking_vertices();
-  // 0号点
-  target_parking_vertices->set_spot_right_top_x(points[0].x);
-  target_parking_vertices->set_spot_right_top_y(points[0].y);
-  // 1号点
-  target_parking_vertices->set_spot_left_top_x(points[1].x);
-  target_parking_vertices->set_spot_left_top_y(points[1].y);
-  // 2号点
-  target_parking_vertices->set_spot_left_down_x(points[2].x);
-  target_parking_vertices->set_spot_left_down_y(points[2].y);
-  // 3号点
-  target_parking_vertices->set_spot_right_down_x(points[3].x);
-  target_parking_vertices->set_spot_right_down_y(points[3].y);
+  auto target_spot = out_msg->mutable_target_parking_spot();
+  target_spot->CopyFrom(spot);
+
+  // 车头朝向
+  out_msg->mutable_hmi()->set_parking_inwards(parking_inwards);
+  // 车位编号
+  out_msg->mutable_hmi()->set_spot_id(spot_id);
 }
