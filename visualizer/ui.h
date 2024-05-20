@@ -6,26 +6,45 @@
 #include <QEvent>
 
 #include "cyber/cyber.h"
-#include "ultrasonic_detection/common/parking_spot_gflags.h"
 #include "ultrasonic_detection/common_msgs/ultrasonic.pb.h"
 #include "ultrasonic_detection/common_msgs/parking_perception.pb.h"
+#include "ultrasonic_detection/common_msgs/InsLocation.pb.h"
 
+using common_msgs::InsLocation::InsLocation;
+using Pose = common_msgs::InsLocation::InsLocation_Pose;
 using common_msgs::ultrasonic::UltrasonicList;
 using common_msgs::parking::proto::ParkingSpotType;
 using common_msgs::hmi::HMI;
+
+const int car_width = 18;
+const int car_length = 48;
 
 class UltrasonicEvent : public QEvent
 {
 public:
     static const QEvent::Type TYPE = static_cast<QEvent::Type>(QEvent::User + 1);
 
-    UltrasonicEvent(const std::shared_ptr<common_msgs::ultrasonic::UltrasonicList>& data)
+    UltrasonicEvent(const std::shared_ptr<UltrasonicList>& data)
         : QEvent(static_cast<QEvent::Type>(TYPE)), data_(data) {}
 
-    std::shared_ptr<common_msgs::ultrasonic::UltrasonicList> data() const { return data_; }
+    std::shared_ptr<UltrasonicList> data() const { return data_; }
 
 private:
-    std::shared_ptr<common_msgs::ultrasonic::UltrasonicList> data_;
+    std::shared_ptr<UltrasonicList> data_;
+};
+
+class LocationEvent : public QEvent
+{
+public:
+    static const QEvent::Type TYPE = static_cast<QEvent::Type>(QEvent::User + 2);
+
+    LocationEvent(const std::shared_ptr<InsLocation>& data)
+        : QEvent(static_cast<QEvent::Type>(TYPE)), data_(data) {}
+
+    std::shared_ptr<InsLocation> data() const { return data_; }
+
+private:
+    std::shared_ptr<InsLocation> data_;
 };
 
 class MainWindow : public QWidget {
@@ -38,6 +57,7 @@ class MainWindow : public QWidget {
       // 创建Writer
       auto node = apollo::cyber::CreateNode("hmi");
       hmi_writer_ = node->CreateWriter<HMI>("hmi/");
+
     }
     void SetQRect(const QVector<QRect>& rectangles) {
       rectangles_ = rectangles;
@@ -50,7 +70,9 @@ class MainWindow : public QWidget {
     bool event(QEvent* event) override;
 
   private:
-    void updateGUI(const std::shared_ptr<UltrasonicList>& ultra);
+    void updateUltra(const std::shared_ptr<UltrasonicList>& ultra);
+
+    void updateLocation(const std::shared_ptr<InsLocation>& location);
 
     QVector<QRect> rectangles_;
 
@@ -58,4 +80,9 @@ class MainWindow : public QWidget {
     bool parking_inwards_ = false;
 
     std::shared_ptr<apollo::cyber::Writer<HMI>> hmi_writer_ = nullptr;
+
+    // ego
+    QPoint ego_point_;
+    double ego_heading_;
+    QRect car_ego_;
 };

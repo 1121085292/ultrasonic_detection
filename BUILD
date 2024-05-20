@@ -16,7 +16,7 @@ cc_library(
         "//ultrasonic_detection/ultrasonic:parking_spot_detection",
         "//ultrasonic_detection/ultrasonic:ultrasonic_detection",
         "//ultrasonic_detection/common:min_filter",
-        "//ultrasonic_detection/common:parking_spot_gflags",
+        # "//ultrasonic_detection/common:parking_spot_gflags",
     ],
     alwayslink = True,
 )
@@ -30,13 +30,27 @@ cc_binary(
     ],
 )
 
-cc_binary(
-    name = "parking_spot",
-    srcs = ["main.cc"],
-    copts = [
-        "-Iexternal/qt",
-    ],
-    deps = [
-      "//ultrasonic_detection/ui:ui"
-    ],
-)
+# cc_library(
+#     name = "target_spot_component_lib",
+#     srcs = ["target_spot_component.cc"],
+#     hdrs = ["target_spot_component.h"],
+#     copts = [
+#         "-Iexternal/qt",
+#     ],
+#     deps = [
+#         "//cyber",
+#         "//ultrasonic_detection/common_msgs:ultrasonic_cc_proto",
+#         "//ultrasonic_detection/common_msgs:InsLocation_cc_proto",
+#         "//ultrasonic_detection/ui:visualizer"
+#     ],
+#     alwayslink = True,
+# )
+
+# cc_binary(
+#     name = "libtarget_spot_component.so",
+#     linkshared = True,
+#     linkstatic = True,
+#     deps = [
+#         ":target_spot_component_lib",
+#     ],
+# )

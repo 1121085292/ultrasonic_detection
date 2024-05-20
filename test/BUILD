@@ -6,6 +6,8 @@ cc_binary(
   name = "fit_line_segment_test",
   srcs = ["fit_line_segment_test.cc"],
   deps = [
+    "//cyber",
+    "//ultrasonic_detection/common_msgs:ultrasonic_cc_proto",
     "//ultrasonic_detection/common:line_segment",
     "@opencv//:core",
     "@opencv//:highgui"

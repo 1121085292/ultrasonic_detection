@@ -212,7 +212,7 @@ void UltrasonicComponent::FillUltraObject(
   auto tmp_map2 = global_pos_map;
   for(size_t sensor_id = 0; sensor_id < points_map.size(); ++sensor_id){
     // 添加障碍物
-    auto ul_obj = out_msg->add_ul_obj();
+    auto ul_obj = out_msg->add_ul_objs();
     // 探头位置
     auto it = kUltrasonicOrientation2NameMap.find(static_cast<UltrasonicOrientation>(sensor_id));
     ul_obj->set_orientation(it->second);

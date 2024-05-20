@@ -1,0 +1,16 @@
+module_config {
+  module_library : "../bazel-bin/ultrasonic_detection/libtarget_spot_component.so"
+
+  components {
+    class_name : "TargetSpotComponent"
+    config {
+      name: "TargetSpotComponent"
+      readers {
+        channel: "perception/ultrasonic"
+      },
+      readers {
+        channel: "location"
+      }
+    }
+  }
+}

@@ -3,17 +3,22 @@
 #include <cstdlib>
 #include <ctime>
 
+#include "cyber/cyber.h"
 #include "ultrasonic_detection/common/line_segment.h"
+#include "ultrasonic_detection/common_msgs/ultrasonic.pb.h"
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#define TEST 0
+
 using namespace cv;
 using namespace std;
+using common_msgs::ultrasonic::UltrasonicList;
 
-const int WIDTH = 1000;
-const int HEIGHT = 1000;
+const int WIDTH = 600;
+const int HEIGHT = 800;
 
 vector<Point2D> generateRandomPoints(int numPoints, double stdDev, double dirX, double dirY)
 {
@@ -31,8 +36,12 @@ vector<Point2D> generateRandomPoints(int numPoints, double stdDev, double dirX, 
   return points;
 }
 
-int main()
-{
+
+
+int main(int argc, char* argv[]) {
+  // 初始化
+  apollo::cyber::Init(argv[0]);
+
   LineFitParams lf;
   lf.min_fit_num = 10;
   lf.min_cluster_size = 5;
@@ -40,21 +49,35 @@ int main()
   lf.merge_angle_threshold = 10;
   lf.merge_dist_threshold = 100;
 
+#if TEST == 1
   srand(time(nullptr));
 
   double stdDev = 10.0;
   double dirX = 50.0;
   double dirY = 20.0;
-
+#endif
+  // 障碍物点
   vector<Point2D> points;
+  auto listener_node = apollo::cyber::CreateNode("points");
+  auto point_listener = listener_node->CreateReader<UltrasonicList>(
+        "perception/ultrasonic", [&points](const std::shared_ptr<UltrasonicList>& ultra){
+          for(const auto& obj : ultra->ul_objs()){
+            if(obj.orientation() == "FRONT_SIDE_RIGHT"){
+              points.emplace_back(Point2D(obj.position_global().x(), obj.position_global().y()));
+            }
+          }
+        });
 
-  // while (true)
-  // {
+  while (true)
+  {
     Mat image(HEIGHT, WIDTH, CV_8UC3, Scalar(255, 255, 255));
-
+#if TEST == 1
     int numNewPoints = rand() % 50 + 10;
     // 随机点
     points = generateRandomPoints(numNewPoints, stdDev, dirX, dirY);
+#endif
+
+    if(points.empty()) continue;
     vector<LineSegment> lineSegments = LineSegment().FitLineSegments(points, lf);
     // 输出拟合结果
     cout << lineSegments.size() << endl;
@@ -76,10 +99,10 @@ int main()
     // 显示结果
     imshow("Line Segment Fitting", image);
     waitKey(0);
-  //   char key = waitKey(30);
-  //   if (key == 27) // Esc键退出
-  //     break;
-  // }
+    char key = waitKey(30);
+    if (key == 27) // Esc键退出
+      break;
+  }
 
   return 0;
 }
