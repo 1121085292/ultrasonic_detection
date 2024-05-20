@@ -16,8 +16,8 @@ using common_msgs::ultrasonic::UltrasonicList;
 using common_msgs::parking::proto::ParkingSpotType;
 using common_msgs::hmi::HMI;
 
-const int car_width = 18;
-const int car_length = 48;
+const int car_width = 48;
+const int car_length = 19;
 
 class UltrasonicEvent : public QEvent
 {

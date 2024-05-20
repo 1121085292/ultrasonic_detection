@@ -16,6 +16,14 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     }
     // 绘制矩形框
     painter.drawRect(rect);
+    // 绘制字母P在矩形框的中心
+    painter.setPen(Qt::black);  // 设置文本颜色
+    QFont font = painter.font();
+    font.setPointSize(20);  // 设置字体大小
+    painter.setFont(font);
+
+    QRect textRect = rect;  // 以矩形框为基础计算文本位置
+    painter.drawText(textRect, Qt::AlignCenter, "P");
   }
   // 绘制自车
   painter.setPen(Qt::blue);
