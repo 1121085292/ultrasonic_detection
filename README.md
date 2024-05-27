@@ -16,11 +16,11 @@ Implement distance measurement and parking spot recognition using ultrasonic bas
 
 - **Hardware**
 
-<div align="center"><img src=docs/image/hardware.png alt="hardware"></div>
+<div align="center"><img src=docs/image/hardware.png alt="hardware" width="600"></div>
 
 - **Software**
 
-<div align="center"><img src=docs/image/software.png alt="software"></div>
+<div align="center"><img src=docs/image/software.png alt="software" width="600"></div>
 
 ## running the code
 
@@ -56,9 +56,9 @@ Implement distance measurement and parking spot recognition using ultrasonic bas
     <div align="center"><img src=docs/image/parking_spots_info.png alt="parking spots infomation"></div>
 5. use your mouse to choose the target parking spot on the Qt display.And then, you can see the target parking spot's infomation on the cyber_monitor terminal.
     <div align="center">parking spots</div>
-    <div align="center"><img src=docs/image/parking_spots.png alt="parking spots"></div>
+    <div align="center"><img src=docs/image/parking_spots.png alt="parking spots" width="600"></div>
     <div align="center">target spot</div>
-    <div align="center"><img src=docs/image/target_spot.png alt="target spot"></div>
+    <div align="center"><img src=docs/image/target_spot.png alt="target spot" width="600"></div>
 
 ## line segment fitting algorithm test
 
