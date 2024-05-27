@@ -5,7 +5,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "parking_spot",
-    srcs = ["main.cc"],
+    srcs = ["parking_spot.cc"],
     copts = [
         "-Iexternal/qt",
     ],
@@ -43,29 +43,3 @@ qt_cc_library(
       "@qt//:qt_widgets",
     ],
 )
-
-# cc_library(
-#   name = "visualizer",
-#   copts = [
-#         "-Iexternal/qt",
-#     ],
-#   deps = [
-#     ":visualizer_lib"
-#   ]
-# )
-
-# qt_cc_library(
-#     name = "visualizer_lib",
-#     srcs = ["visualizer.cc"],
-#     hdrs =  ["visualizer.h"],
-#     copts = [
-#         "-Iexternal/qt",
-#     ],
-#     deps = [
-#       "//ultrasonic_detection/ultrasonic:parking_spot_detection",
-#       "@qt//:qt_core",
-#       "@qt//:qt_gui",
-#       "@qt//:qt_opengl",
-#       "@qt//:qt_widgets",
-#     ],
-# )
