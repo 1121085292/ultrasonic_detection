@@ -1,6 +1,6 @@
 #include "ultrasonic_detection/ui/ui.h"
 
-void MainWindow::paintEvent(QPaintEvent *event) {
+void MainWindow::paintEvent(QPaintEvent* event) {
   QPainter painter(this);
   // 遍历所有矩形框
   for (int i = 0; i < rectangles_.size(); ++i) {
@@ -30,7 +30,7 @@ void MainWindow::paintEvent(QPaintEvent *event) {
   painter.drawRect(car_ego_);
 }
 
-void MainWindow::mousePressEvent(QMouseEvent *event) {
+void MainWindow::mousePressEvent(QMouseEvent* event) {
   // 在鼠标点击时获取所选矩形框的 ID 信息
   for (int i = 0; i < rectangles_.size(); ++i) {
     if (rectangles_[i].contains(event->pos())) {
@@ -46,10 +46,10 @@ void MainWindow::mousePressEvent(QMouseEvent *event) {
       break;
     }
   }
-  repaint(); // 立即触发重绘
+  repaint();  // 立即触发重绘
 }
 
-bool MainWindow::event(QEvent *event) { 
+bool MainWindow::event(QEvent* event) {
   if (event->type() == UltrasonicEvent::TYPE) {
     const auto ultrasonicEvent = static_cast<UltrasonicEvent*>(event);
     const auto& ultra = ultrasonicEvent->data();
@@ -67,12 +67,12 @@ bool MainWindow::event(QEvent *event) {
   return QWidget::event(event);
 }
 
-void MainWindow::updateUltra(const std::shared_ptr<UltrasonicList> &ultra) {
+void MainWindow::updateUltra(const std::shared_ptr<UltrasonicList>& ultra) {
   // set QVector<QRect> rectangles_
   rectangles_.clear();
 
   auto spots = ultra->parking_spots_info();
-  for(const auto& spot : spots.parking_spots()){
+  for (const auto& spot : spots.parking_spots()) {
     // ParkingSpot类型的spot到QRect类型转换，调用QRect(topleft, bottomright)
     QPoint topleft(spot.spot_left_top_x(), spot.spot_left_top_y());
     QPoint bottomright(spot.spot_right_down_x(), spot.spot_right_down_y());
@@ -90,13 +90,18 @@ void MainWindow::updateLocation(const std::shared_ptr<InsLocation>& location) {
   // 航向角
   double heading = pose.heading();
   // topleft
-  double topleft_x = x + car_width / 2 * cos(heading) - car_length / 2 * sin(heading);
-  double topleft_y = y + car_width / 2 * sin(heading) + car_length / 2 * cos(heading);
+  double topleft_x =
+      x + car_width / 2 * cos(heading) - car_length / 2 * sin(heading);
+  double topleft_y =
+      y + car_width / 2 * sin(heading) + car_length / 2 * cos(heading);
   // bottomright
-  double bottomright_x = x - car_width / 2 * cos(heading) + car_length / 2 * sin(heading);
-  double bottomright_y = y - car_width / 2 * sin(heading) - car_length / 2 * cos(heading);
+  double bottomright_x =
+      x - car_width / 2 * cos(heading) + car_length / 2 * sin(heading);
+  double bottomright_y =
+      y - car_width / 2 * sin(heading) - car_length / 2 * cos(heading);
 
-  car_ego_ = QRect(QPoint(topleft_x, topleft_y), QPoint(bottomright_x, bottomright_y));
-  
+  car_ego_ =
+      QRect(QPoint(topleft_x, topleft_y), QPoint(bottomright_x, bottomright_y));
+
   update();
 }

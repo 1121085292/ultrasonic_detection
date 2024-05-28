@@ -1,20 +1,27 @@
+/**
+ * @file talker_location.cc
+ * @brief
+ * @author tangpeng
+ * @version 1.0
+ * @date 2024-05-28
+ * @copyright Copyright (c) 2024 tangpeng. All rights reserved.
+ */
+#include "ultrasonic_detection/common_msgs/InsLocation.pb.h"
+
 #include "cyber/cyber.h"
 #include "cyber/time/clock.h"
-#include "ultrasonic_detection/common_msgs/InsLocation.pb.h"
 
 using apollo::cyber::Clock;
 using common_msgs::InsLocation::InsLocation;
 
-void PublishLocation(){
-
+void PublishLocation() {
   // 创建节点
   auto talker_node = apollo::cyber::CreateNode("location");
   // 创建发布者
   auto talker = talker_node->CreateWriter<InsLocation>("location");
   // 设置频率
-  apollo::cyber::Rate rate(1.0);    //1Hz
-  while (apollo::cyber::OK())
-  {
+  apollo::cyber::Rate rate(1.0);  // 1Hz
+  while (apollo::cyber::OK()) {
     auto msg = std::make_shared<InsLocation>();
     // 组织数据
     msg->mutable_header()->set_timestamp_sec(Clock::NowInSeconds());

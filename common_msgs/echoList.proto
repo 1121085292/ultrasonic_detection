@@ -7,9 +7,9 @@ import "ultrasonic_detection/common_msgs/error_code.proto";
 message Echo {
   //  ultrasonic orientation
   /*
-  * front  left->right(0-5):FSL(forword_side_left), FOL, FCL, FCR, FOR, FSR
-  * rear left->right(6-11):RSL(backword_side_left), ROL, RCL, RCR, ROR, RSR
-  */
+   * front  left->right(0-5):FSL(forword_side_left), FOL, FCL, FCR, FOR, FSR
+   * rear left->right(6-11):RSL(backword_side_left), ROL, RCL, RCR, ROR, RSR
+   */
   optional uint32 sensor_id = 1;
   //  幅值
   optional uint32 amp = 2;
@@ -28,23 +28,23 @@ message Echo {
 }
 
 message DiagData {
-  optional uint32 chip_temp = 1;  
-  optional uint32 v_sup = 2;  
-  optional uint32 noise_sum = 3;  
-  optional uint32 noise_count = 4;  // Burst  
-  optional uint32 burst_length = 5;  
-  optional uint32 v_tank1 = 6;  
-  optional uint32 v_tank2 = 7;  // Ring  
-  optional uint32 ring_count = 8; 
-  optional uint32 ring_samples = 9;  
+  optional uint32 chip_temp = 1;
+  optional uint32 v_sup = 2;
+  optional uint32 noise_sum = 3;
+  optional uint32 noise_count = 4;  // Burst
+  optional uint32 burst_length = 5;
+  optional uint32 v_tank1 = 6;
+  optional uint32 v_tank2 = 7;  // Ring
+  optional uint32 ring_count = 8;
+  optional uint32 ring_samples = 9;
   optional uint32 rtm = 10;
 }
 
 message NFD {
-  optional bool nfd1_flag = 1;  
+  optional bool nfd1_flag = 1;
   optional bool nfd2_flag = 2;
-  optional uint32 nfd1_echo = 3;  
-  optional uint32 nfd2_echo = 4; 
+  optional uint32 nfd1_echo = 3;
+  optional uint32 nfd2_echo = 4;
   optional uint32 nfd3_echo = 5;
   optional uint32 nfd_result = 6;
 }

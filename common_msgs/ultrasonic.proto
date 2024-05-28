@@ -10,11 +10,7 @@ message Point {
   optional double y = 2;
 }
 enum Status {
-  Normal = 0;
-  BlindZone = 1;
-  OverDetection = 2;
-  Noise = 3;
-  InvalidPoint = 4;
+  Normal = 0; BlindZone = 1; OverDetection = 2; Noise = 3; InvalidPoint = 4;
 }
 
 message Ultrasonic {

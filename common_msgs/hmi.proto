@@ -1,7 +1,6 @@
-syntax="proto2";
+syntax = "proto2";
 
 package common_msgs.hmi;
-
 
 message HMI {
   optional uint32 spot_id = 1;

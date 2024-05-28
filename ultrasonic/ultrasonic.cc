@@ -1,12 +1,20 @@
+/**
+ * @file ultrasonic.cc
+ * @brief
+ * @author tangpeng
+ * @version 1.0
+ * @date 2024-05-28
+ * @copyright Copyright (c) 2024 tangpeng. All rights reserved.
+ */
 #include "ultrasonic.h"
 
-void Ultrasonic::DirectMeasuredPositionCalculate(){
-  if(meas_dis_ == ultra_params_.max_range){
+void Ultrasonic::DirectMeasuredPositionCalculate() {
+  if (meas_dis_ == ultra_params_.max_range) {
     point_ = Point2D(0.0, 0.0);
     SetStatus(Status::OverDetection);
   } else {
     point_.x = coordinate_.x + meas_dis_ * cos(coordinate_.angle);
-    if(coordinate_.y < 0){
+    if (coordinate_.y < 0) {
       point_.y = coordinate_.y - meas_dis_ * sin(coordinate_.angle);
     } else {
       point_.y = coordinate_.y + meas_dis_ * sin(coordinate_.angle);
@@ -15,13 +23,14 @@ void Ultrasonic::DirectMeasuredPositionCalculate(){
   }
 }
 
-void Ultrasonic::GlobalDirectPositionCalculate(const std::shared_ptr<Pose>& pose){
-  if(ultra_status_ != Status::Normal){
+void Ultrasonic::GlobalDirectPositionCalculate(
+    const std::shared_ptr<Pose>& pose) {
+  if (ultra_status_ != Status::Normal) {
     point_global_ = point_;
   } else {
-    point_global_.x = pose->position().x()
-          + point_.x * cos(pose->heading()) - point_.y * sin(pose->heading());
-    point_global_.y = pose->position().y()
-          + point_.x * sin(pose->heading()) + point_.y * cos(pose->heading());
+    point_global_.x = pose->position().x() + point_.x * cos(pose->heading()) -
+                      point_.y * sin(pose->heading());
+    point_global_.y = pose->position().y() + point_.x * sin(pose->heading()) +
+                      point_.y * cos(pose->heading());
   }
 }

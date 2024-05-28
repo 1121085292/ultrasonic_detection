@@ -1,13 +1,10 @@
-syntax="proto2";
+syntax = "proto2";
 
 package common_msgs.parking.proto;
 
 import "ultrasonic_detection/common_msgs/hmi.proto";
 
-enum ParkingSpotType {
-  VERTICAL_PLOT = 0;
-  PARALLEL_PARKING = 1;
-}
+enum ParkingSpotType { VERTICAL_PLOT = 0; PARALLEL_PARKING = 1; }
 
 message ParkingSpot {
   optional double spot_left_top_x = 1;
@@ -28,6 +25,6 @@ message TargetParkingSpotInfo {
 }
 
 message ParkingSpotsInfo {
-  optional uint32 spots_cnt = 1 ;
+  optional uint32 spots_cnt = 1;
   repeated ParkingSpot parking_spots = 2;
 }

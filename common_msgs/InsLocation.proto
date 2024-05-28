@@ -2,18 +2,18 @@ syntax = "proto2";
 
 package common_msgs.InsLocation;
 
-message InsLocation{
-  optional double vehicleX =1;
-  optional double vehicleY =2;
-  optional double vehicleZ =3;
-  optional double velocityX =4;
-  optional double velocityY =5;
-  optional double gyroscopeZ =6;
-  optional double theta =7;
-  optional double pitch =8;
-  optional double roll =9;
-  optional Header header =10;
-  optional Pose pose =11;
+message InsLocation {
+  optional double vehicleX = 1;
+  optional double vehicleY = 2;
+  optional double vehicleZ = 3;
+  optional double velocityX = 4;
+  optional double velocityY = 5;
+  optional double gyroscopeZ = 6;
+  optional double theta = 7;
+  optional double pitch = 8;
+  optional double roll = 9;
+  optional Header header = 10;
+  optional Pose pose = 11;
 
   message Header {
     // Message publishing time in seconds.
@@ -21,8 +21,8 @@ message InsLocation{
     // Module name.
     optional string module_name = 2;
 
-    // Sequence number for each message. Each module maintains its own counter for
-    // sequence_num, always starting from 1 on boot.
+    // Sequence number for each message. Each module maintains its own counter
+    // for sequence_num, always starting from 1 on boot.
     optional uint32 sequence_num = 3;
   }
   message Pose {
@@ -34,9 +34,12 @@ message InsLocation{
     // North.
     optional double heading = 6;
     message PointENU {
-      optional double x = 1 [default = nan];  // East from the origin, in meters.
-      optional double y = 2 [default = nan];  // North from the origin, in meters.
-      optional double z = 3 [default = 0.0];  // Up from the WGS-84 ellipsoid, in meters.
+      optional double x =
+          1 [default = nan];  // East from the origin, in meters.
+      optional double y =
+          2 [default = nan];  // North from the origin, in meters.
+      optional double z =
+          3 [default = 0.0];  // Up from the WGS-84 ellipsoid, in meters.
     }
   }
 }

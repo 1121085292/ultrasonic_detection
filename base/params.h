@@ -1,8 +1,16 @@
+/**
+ * @file params.h
+ * @brief
+ * @author tangpeng
+ * @version 1.0
+ * @date 2024-05-28
+ * @copyright Copyright (c) 2024 tangpeng. All rights reserved.
+ */
 #pragma once
 
 struct MinFilterParams {
   int window_size = 3;
-  int threshold = 20;    //mm
+  int threshold = 20;  // mm
 };
 
 struct UltrasonicParams {
@@ -17,7 +25,7 @@ struct LineFitParams {
   double merge_dist_threshold;
 };
 
-struct ParkingSpotParams{
+struct ParkingSpotParams {
   // 边界长度阈值
   double line_length_threshold = 2500.0;
   double line_width_threshold = 800.0;
@@ -36,9 +44,7 @@ struct ParkingSpotParams{
   double angle_threshold;
 };
 
-struct CurbParams
-{
+struct CurbParams {
   double angle_threshold;
   double length_threshold;
 };
-
