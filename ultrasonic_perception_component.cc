@@ -1,11 +1,3 @@
-/**
- * @file ultrasonic_perception_component.cc
- * @brief
- * @author tangpeng
- * @version 1.0
- * @date 2024-05-28
- * @copyright Copyright (c) 2024 tangpeng. All rights reserved.
- */
 #include "ultrasonic_perception_component.h"
 
 #include "cyber/time/clock.h"
@@ -22,7 +14,7 @@ bool UltrasonicComponent::Init() {
   }
   ADEBUG << "Ultrasonic Config:\n" << ultra_config.DebugString();
   // 探头安装坐标
-  ultrasonic_detection::proto::UltrasonicCoordinatse ultra_coordinate;
+  ultrasonic_detection::proto::UltrasonicCoordinate ultra_coordinate;
   // 左侧2个探头在整车坐标系下的位置
   coordinate_map_[0] =
       Point3D(ultra_coordinate.fsl_x(), ultra_coordinate.fsl_y(),

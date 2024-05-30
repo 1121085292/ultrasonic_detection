@@ -35,6 +35,6 @@ cc_binary(
   deps = [
     "//cyber",
     "//ultrasonic_detection/common_msgs:ultrasonic_cc_proto",
-    "//ultrasonic_detection/common_msgs:parking_perception_cc_proto",
+    "//ultrasonic_detection/common_msgs:parking_spots_cc_proto",
   ]
 )

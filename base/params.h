@@ -1,11 +1,3 @@
-/**
- * @file params.h
- * @brief
- * @author tangpeng
- * @version 1.0
- * @date 2024-05-28
- * @copyright Copyright (c) 2024 tangpeng. All rights reserved.
- */
 #pragma once
 
 struct MinFilterParams {

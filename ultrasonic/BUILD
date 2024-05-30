@@ -53,6 +53,6 @@ cc_library(
     "//cyber",
     "//ultrasonic_detection/common:line_segment",
     "//ultrasonic_detection/common_msgs:InsLocation_cc_proto",
-    "//ultrasonic_detection/common_msgs:parking_perception_cc_proto",
+    "//ultrasonic_detection/common_msgs:parking_spots_cc_proto",
   ]
 )

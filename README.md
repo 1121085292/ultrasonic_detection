@@ -10,7 +10,7 @@
 
 ## Introduction
 
-Implement distance measurement and parking spot recognition using ultrasonic based on the [Apollo](https://github.com/ApolloAuto/apollo) open-source Cyber RT framework.Modules inputs are [ultrasonic signals](common_msgs/echoList.proto) and [location information](common_msgs/InsLocation.proto),outputs are [obstacal position](common_msgs/ultrasonic.proto) and [parking spot infomation](common_msgs/parking_spots.proto)
+Implement distance measurement and parking spot recognition using ultrasonic based on the [Apollo](https://github.com/ApolloAuto/apollo) open-source Cyber RT framework.Modules inputs are [ultrasonic signals](common_msgs/echoList.proto) and [location information](common_msgs/InsLocation.proto),outputs are [obstacal position](common_msgs/ultrasonic.proto) and [parking spots infomation](common_msgs/parking_spots.proto)
 
 ## Architecture
 
@@ -35,13 +35,13 @@ Implement distance measurement and parking spot recognition using ultrasonic bas
 3. run the following command in the `apollo-master` folder:
 
     ```bash
-    bash run_ultra_perception.sh
+    bash ultrasonic_detection/run_ultra_perception.sh
     ```
 
     open another terminal and run the following command to start the GUI:
 
     ```bash
-    bash run_visualizer.sh
+    bash ultrasonic_detection/run_visualizer.sh
     ```
 
 4. open a new terminal and run the following command to start the Cyber RT monitor:
@@ -65,7 +65,7 @@ Implement distance measurement and parking spot recognition using ultrasonic bas
 The line segment fitting algorithm is used to boundary fitting. The algorithm introduces the LT(Line Tracking) method into the IEPF(Iterative End-Point Fitting) method to make the line segment extraction method better achieve adaptive fitting and it takes in the boundary points and returns a line segment.The algorithm is implemented in the `common/line_segment.h` file.You can run the following command to test the line segment fitting algorithm:
 
 ```bash
-bash run_line_segment_test.sh
+bash ultrasonic_detection/test/run_line_segment_test.sh
 ```
 
 If you want to test the algorithm with your own data, you can modify the `test/fit_line_segment_test.cc` file.The `test/fit_line_segment_test.cc` file uses a listener to subscribe to channel messages to get the boundary points,you can to write a talker node to publish `perception/ultrasonic` channel message or use other methods to get the boundary points.

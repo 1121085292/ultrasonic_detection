@@ -6,7 +6,7 @@
 #include <QtWidgets>
 
 #include "ultrasonic_detection/common_msgs/InsLocation.pb.h"
-#include "ultrasonic_detection/common_msgs/parking_perception.pb.h"
+#include "ultrasonic_detection/common_msgs/parking_spots.pb.h"
 #include "ultrasonic_detection/common_msgs/ultrasonic.pb.h"
 
 #include "cyber/cyber.h"

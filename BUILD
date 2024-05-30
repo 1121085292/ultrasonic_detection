@@ -7,7 +7,6 @@ cc_library(
     srcs = ["ultrasonic_perception_component.cc"],
     hdrs = ["ultrasonic_perception_component.h"],
     deps = [
-        "//cyber",
         "//ultrasonic_detection/base:ultrasonic_orientation",
         "//ultrasonic_detection/common_msgs:echo_list_cc_proto",
         "//ultrasonic_detection/common_msgs:ultrasonic_cc_proto",

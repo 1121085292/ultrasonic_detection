@@ -1,11 +1,3 @@
-/**
- * @file ultrasonic_perception_component.h
- * @brief
- * @author tangpeng
- * @version 1.0
- * @date 2024-05-28
- * @copyright Copyright (c) 2024 tangpeng. All rights reserved.
- */
 #pragma once
 #include <atomic>
 #include <future>
@@ -17,7 +9,7 @@
 
 #include "ultrasonic_detection/common_msgs/echo_list.pb.h"
 #include "ultrasonic_detection/common_msgs/hmi.pb.h"
-#include "ultrasonic_detection/common_msgs/parking_perception.pb.h"
+#include "ultrasonic_detection/common_msgs/parking_spots.pb.h"
 #include "ultrasonic_detection/common_msgs/ultrasonic.pb.h"
 #include "ultrasonic_detection/proto/ultrasonic_conf.pb.h"
 

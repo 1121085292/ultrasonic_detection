@@ -33,7 +33,7 @@ qt_cc_library(
     ],
     deps = [
       "//cyber",
-      "//ultrasonic_detection/common_msgs:parking_perception_cc_proto",
+      "//ultrasonic_detection/common_msgs:parking_spots_cc_proto",
       "//ultrasonic_detection/common_msgs:ultrasonic_cc_proto",
       "//ultrasonic_detection/common_msgs:hmi_cc_proto",
       "//ultrasonic_detection/common_msgs:InsLocation_cc_proto",

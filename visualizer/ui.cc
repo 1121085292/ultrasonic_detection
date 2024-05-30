@@ -1,4 +1,4 @@
-#include "ultrasonic_detection/ui/ui.h"
+#include "ultrasonic_detection/visualizer/ui.h"
 
 void MainWindow::paintEvent(QPaintEvent* event) {
   QPainter painter(this);
@@ -34,7 +34,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event) {
   // 在鼠标点击时获取所选矩形框的 ID 信息
   for (int i = 0; i < rectangles_.size(); ++i) {
     if (rectangles_[i].contains(event->pos())) {
-      // 设置 GFLAGS_id 的值为所选矩形框的 ID 信息
+      // 设置 spot_id_ 的值为所选矩形框的 ID 信息
       spot_id_ = i;
       qDebug() << "Selected Spot ID:" << spot_id_;
 

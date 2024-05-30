@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script runs the ultrasonic perception component.  
+# This script runs the visualizer for the parking spot detection.  
 
 set -e
 
@@ -11,7 +11,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../" && pwd)"
 
 cd "$PROJECT_ROOT"
 
-# Build the ultrasonic perception component
+# Build
 bazel build ultrasonic_detection/visualizer:parking_spot
 
 if [ $? -eq 0 ]; then
@@ -20,7 +20,7 @@ else
   echo "Building parking_spot GUI failed." >&2
 fi
 
-# Run the ultrasonic perception component
+# Run
 source cyber/setup.bash
 
 ./bazel-bin/ultrasonic_detection/visualizer/parking_spot

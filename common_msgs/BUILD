@@ -16,15 +16,15 @@ proto_library(
 )
 
 cc_proto_library(
-  name = "parking_perception_cc_proto",
+  name = "parking_spots_cc_proto",
   deps = [
-      ":parking_perception_proto",
+      ":parking_spots_proto",
   ],
 )
 
 proto_library(
-  name = "parking_perception_proto",
-  srcs = ["parking_perception.proto"],
+  name = "parking_spots_proto",
+  srcs = ["parking_spots.proto"],
   deps = [
     ":hmi_proto"
   ]
@@ -69,7 +69,7 @@ proto_library(
   srcs = ["ultrasonic.proto"],
   deps = [
     ":error_code_proto",
-    ":parking_perception_proto"
+    ":parking_spots_proto"
   ]
 )
 
