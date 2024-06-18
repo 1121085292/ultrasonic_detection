@@ -6,7 +6,7 @@ struct MinFilterParams {
 };
 
 struct UltrasonicParams {
-  int max_range = 5000;
+  int max_range = 5080;
 };
 
 struct LineFitParams {

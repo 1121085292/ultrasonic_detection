@@ -13,9 +13,9 @@
 
 using common_msgs::InsLocation::InsLocation;
 using Pose = common_msgs::InsLocation::InsLocation_Pose;
-using common_msgs::hmi::HMI;
-using common_msgs::parking::proto::ParkingSpotType;
-using common_msgs::ultrasonic::UltrasonicList;
+using uss::common_msgs::HMI;
+using uss::common_msgs::ParkingSpotType;
+using uss::common_msgs::UltrasonicList;
 
 const int car_width = 48;
 const int car_length = 19;

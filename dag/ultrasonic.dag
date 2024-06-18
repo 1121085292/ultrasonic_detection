@@ -7,7 +7,7 @@ module_config {
       name: "UltrasonicComponent"
       config_file_path :"../ultrasonic_detection/conf/ultrasonic_conf.pb.txt"
       readers {
-        channel: "echo_list"
+        channel: "can_data_list"
       },
       readers {
         channel: "location"

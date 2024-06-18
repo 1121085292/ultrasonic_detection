@@ -8,13 +8,14 @@ cc_library(
     hdrs = ["ultrasonic_perception_component.h"],
     deps = [
         "//ultrasonic_detection/base:ultrasonic_orientation",
-        "//ultrasonic_detection/common_msgs:echo_list_cc_proto",
         "//ultrasonic_detection/common_msgs:ultrasonic_cc_proto",
         "//ultrasonic_detection/common_msgs:hmi_cc_proto", 
+        "//common_msgs/car:can_data_cc_proto", 
         "//ultrasonic_detection/proto:ultrasonic_conf_cc_proto",
         "//ultrasonic_detection/ultrasonic:parking_spot_detection",
         "//ultrasonic_detection/ultrasonic:ultrasonic_detection",
-        "//ultrasonic_detection/common:min_filter",
+        "//car/byd:uss_interface",
+        "//opendbc/can/dbc_out:PDC_USS",
     ],
     alwayslink = True,
 )

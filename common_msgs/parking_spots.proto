@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package common_msgs.parking.proto;
+package uss.common_msgs;
 
 import "ultrasonic_detection/common_msgs/hmi.proto";
 
@@ -21,7 +21,7 @@ message ParkingSpot {
 
 message TargetParkingSpotInfo {
   optional ParkingSpot target_parking_spot = 1;
-  optional common_msgs.hmi.HMI hmi = 2;
+  optional uss.common_msgs.HMI hmi = 2;
 }
 
 message ParkingSpotsInfo {

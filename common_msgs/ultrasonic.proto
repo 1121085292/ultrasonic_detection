@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package common_msgs.ultrasonic;
+package uss.common_msgs;
 
 import "ultrasonic_detection/common_msgs/error_code.proto";
 import "ultrasonic_detection/common_msgs/parking_spots.proto";
@@ -41,7 +41,7 @@ message UltrasonicList {
   // 车辆12个探头输出的障碍物
   repeated Ultrasonic ul_objs = 2;
   // 错误码
-  optional common_msgs.error_code.ErrorCode error_code = 3;
+  optional uss.common_msgs.ErrorCode error_code = 3;
   // 空间车位
-  optional common_msgs.parking.proto.ParkingSpotsInfo parking_spots_info = 4;
+  optional uss.common_msgs.ParkingSpotsInfo parking_spots_info = 4;
 }

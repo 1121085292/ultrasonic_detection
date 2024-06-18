@@ -1,14 +1,14 @@
 syntax = "proto2";
 
-package common_msgs.echo_list;
+package uss.common_msgs;
 
 import "ultrasonic_detection/common_msgs/error_code.proto";
 
 message Echo {
   //  ultrasonic orientation
   /*
-   * front  left->right(0-5):FSL(forword_side_left), FOL, FCL, FCR, FOR, FSR
-   * rear left->right(6-11):RSL(backword_side_left), ROL, RCL, RCR, ROR, RSR
+   * front  left->right(1-6):FSL(forword_side_left), FOL, FCL, FCR, FOR, FSR
+   * rear left->right(7-12):RSL(backword_side_left), ROL, RCL, RCR, ROR, RSR
    */
   optional uint32 sensor_id = 1;
   //  幅值
@@ -20,9 +20,9 @@ message Echo {
   //  置信度
   optional uint32 confidence = 5;
   //  距离：根据时间算出的目标距离mm
-  repeated uint32 distances = 6;
+  optional uint32 distance = 6;
   //  错误码
-  optional common_msgs.error_code.ErrorCode error_code = 7 [default = OK];
+  optional uss.common_msgs.ErrorCode error_code = 7 [default = OK];
   //  测量状态,0表示间接测量，1表示直接测量
   //  optional bool status = 8 [default = 1];
 }
@@ -54,7 +54,7 @@ message EchoList {
   //  时间戳
   optional uint32 timestamp = 1;
   //  12个探头信号，每个探头输出8个障碍物信息
-  repeated Echo echo_list = 2;
+  repeated Echo echo = 2;
   //  回波数量
   optional uint32 echo_cnt = 3;
   //  诊断信号

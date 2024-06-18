@@ -4,8 +4,8 @@
 #include "cyber/time/clock.h"
 
 using apollo::cyber::Clock;
-using common_msgs::echo_list::EchoList;
-using common_msgs::error_code::ErrorCode;
+using uss::common_msgs::EchoList;
+using uss::common_msgs::ErrorCode;
 
 void PublishEcho() {
   // 创建节点
@@ -19,13 +19,13 @@ void PublishEcho() {
     // 组织数据
     msg->set_timestamp(Clock::NowInSeconds());
     // sensor_id = 0
-    auto echo = msg->add_echo_list();
+    auto echo = msg->add_echo();
     echo->set_sensor_id(0);
     echo->add_distances(1000);
     echo->set_error_code(ErrorCode::PERCEPTION_ERROR);
     // 探头数据
     for (int i = 1; i < 12; ++i) {
-      auto echo = msg->add_echo_list();
+      auto echo = msg->add_echo();
       echo->set_sensor_id(i);
       echo->add_distances(1000);
       echo->set_error_code(ErrorCode::OK);

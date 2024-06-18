@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package common_msgs.error_code;
+package uss.common_msgs;
 
 // Error codes enum for API's categorized by modules.
 enum ErrorCode {

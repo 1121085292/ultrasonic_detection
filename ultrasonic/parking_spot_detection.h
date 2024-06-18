@@ -9,8 +9,8 @@
 #include "cyber/cyber.h"
 
 using Pose = common_msgs::InsLocation::InsLocation_Pose;
-using common_msgs::parking::proto::ParkingSpot;
-using common_msgs::parking::proto::ParkingSpotType;
+using uss::common_msgs::ParkingSpot;
+using uss::common_msgs::ParkingSpotType;
 /**
  * @brief
  */

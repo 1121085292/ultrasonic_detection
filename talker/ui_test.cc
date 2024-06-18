@@ -6,8 +6,8 @@
 #include "cyber/cyber.h"
 #include "cyber/time/clock.h"
 
-using common_msgs::parking::proto::ParkingSpotType;
-using common_msgs::ultrasonic::UltrasonicList;
+using uss::common_msgs::ParkingSpotType;
+using uss::common_msgs::UltrasonicList;
 
 int main(int argc, char* argv[]) {
   std::srand(time(nullptr));

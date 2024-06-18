@@ -7,7 +7,7 @@
 #include "ultrasonic_detection/common_msgs/ultrasonic.pb.h"
 
 using common_msgs::InsLocation::InsLocation;
-using common_msgs::ultrasonic::Status;
+using uss::common_msgs::Status;
 using Pose = common_msgs::InsLocation::InsLocation_Pose;
 
 class Ultrasonic {

@@ -2,12 +2,13 @@
 #include <atomic>
 #include <future>
 
+#include "car/byd/uss_interface.h"
+#include "opendbc/can/dbc_out/PDC_USS.h"
 #include "ultrasonic_detection/base/ultrasonic_orientation.h"
-#include "ultrasonic_detection/common/min_filter.h"
 #include "ultrasonic_detection/ultrasonic/parking_spot_detection.h"
 #include "ultrasonic_detection/ultrasonic/ultrasonic_detection.h"
 
-#include "ultrasonic_detection/common_msgs/echo_list.pb.h"
+#include "common_msgs/car/can_data.pb.h"
 #include "ultrasonic_detection/common_msgs/hmi.pb.h"
 #include "ultrasonic_detection/common_msgs/parking_spots.pb.h"
 #include "ultrasonic_detection/common_msgs/ultrasonic.pb.h"
@@ -15,21 +16,20 @@
 
 #include "cyber/cyber.h"
 
-#define Minfilter 0
+dbc_init(PDC_USS);
 
 using apollo::cyber::Component;
-using common_msgs::echo_list::Echo;
-using common_msgs::echo_list::EchoList;
-using common_msgs::hmi::HMI;
-using common_msgs::parking::proto::TargetParkingSpotInfo;
-using common_msgs::ultrasonic::UltrasonicList;
+using common_msgs::can_data::CanDataList;
 using ultrasonic_detection::proto::UltrasonicConfig;
+using uss::common_msgs::HMI;
+using uss::common_msgs::TargetParkingSpotInfo;
+using uss::common_msgs::UltrasonicList;
 
-class UltrasonicComponent : public Component<EchoList, InsLocation> {
+class UltrasonicComponent : public Component<CanDataList, InsLocation> {
  public:
   bool Init() override;
 
-  bool Proc(const std::shared_ptr<EchoList>& echo_list,
+  bool Proc(const std::shared_ptr<CanDataList>& can_data_list,
             const std::shared_ptr<InsLocation>& location) override;
 
  private:
@@ -71,5 +71,7 @@ class UltrasonicComponent : public Component<EchoList, InsLocation> {
   std::map<size_t, ParkingSpot> spots_;
   // 车位id
   size_t spot_id_ = 0;
+  // 解析超声波雷达can数据
+  std::shared_ptr<USSInterface> uss_interface_ptr_ = nullptr;
 };
 CYBER_REGISTER_COMPONENT(UltrasonicComponent);
