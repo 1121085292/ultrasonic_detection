@@ -92,7 +92,7 @@ bool UltrasonicComponent::Init() {
       "perception/ultrasonic/parkingSpot/");
   hmi_reader_ = node_->CreateReader<HMI>("hmi/");
 
-  //
+  // 超声波雷达can解析器
   uss_interface_ptr_ = std::make_shared<USSInterface>();
   return true;
 }

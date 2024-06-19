@@ -5,7 +5,7 @@
       "name": "(gdb) Launch",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/path/xxx.exe", //这个是调试的可执行程序的路径
+      "program": "${workspaceFolder}/a.exe", //这个是调试的可执行程序的路径/
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

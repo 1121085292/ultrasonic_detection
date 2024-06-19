@@ -2,7 +2,7 @@
 #include <atomic>
 #include <future>
 
-#include "car/byd/uss_interface.h"
+#include "car/lzqzds/uss_interface.h"
 #include "opendbc/can/dbc_out/PDC_USS.h"
 #include "ultrasonic_detection/base/ultrasonic_orientation.h"
 #include "ultrasonic_detection/ultrasonic/parking_spot_detection.h"

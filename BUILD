@@ -14,7 +14,7 @@ cc_library(
         "//ultrasonic_detection/proto:ultrasonic_conf_cc_proto",
         "//ultrasonic_detection/ultrasonic:parking_spot_detection",
         "//ultrasonic_detection/ultrasonic:ultrasonic_detection",
-        "//car/byd:uss_interface",
+        "//car/lzqzds:uss_interface",
         "//opendbc/can/dbc_out:PDC_USS",
     ],
     alwayslink = True,
