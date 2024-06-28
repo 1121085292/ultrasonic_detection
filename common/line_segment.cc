@@ -52,10 +52,13 @@ double LineSegment::AngleBetweenLines(const LineSegment& line) {
   auto dir2 = line.GetDirection();
 
   double dot = dir1.dot(dir2);
-  // 弧长
-  return fabs(acos(dot / (Length() * line.Length())));
+  double len1 = Length();
+  double len2 = line.Length();
+  if (len1 == 0 || len2 == 0) {
+    return 0.0;  // 或者抛出异常
+  }
+  return fabs(acos(dot / (len1 * len2)));
 }
-
 double LineSegment::ProjectLength(double heading) const {
   auto line1 = LineSegment(start_, end_);
   // 单位向量
