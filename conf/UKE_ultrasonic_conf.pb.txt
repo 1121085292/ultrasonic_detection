@@ -1,0 +1,58 @@
+ultrasonic_coordinate {
+  FSL_x: 3.41095
+  FSL_y: 0.89335
+  FSL_angle: 86.5
+  RSL_x: -0.50822
+  RSL_y: 0.89927
+  RSL_angle: 93.9
+  FCR_x: 3.73381;
+  FCR_y: -0.3026;
+  FCR_angle: 11.34
+  FCL_x: 3.73381;
+  FCL_y: 0.3026;
+  FCL_angle: 11.34
+  FOR_x: 3.5949;
+  FOR_y: -0.61443;
+  FOR_angle: 30.94
+  FOL_x: 3.5949;
+  FOL_y: 0.61443;
+  FOL_angle: 30.94
+  RCR_x: -0.96855;
+  RCR_y: -0.34061;
+  RCR_angle: 176.64
+  RCL_x: -0.96855;
+  RCL_y: 0.34061;
+  RCL_angle: 176.64
+  ROR_x: -0.81376;
+  ROR_y: -0.71072;
+  ROR_angle: 139.8
+  ROL_x: -0.81376;
+  ROL_y: 0.71072;
+  ROL_angle: 139.8
+  FSR_x: 3.41095
+  FSR_y: -0.89335
+  FSR_angle: 86.5
+  RSR_x: -0.50822
+  RSR_y: -0.89927
+  RSR_angle: 93.9
+}
+
+use_triangle_measured: false
+line_fit_config {
+  min_fit_num: 10
+  min_cluster_size: 5
+  cluster_dist_threshold: 50
+  merge_angle_threshold: 10
+  merge_dist_threshold: 50
+}
+parking_spot_config {
+  grow_line_dist: 50
+  grow_line_angle: 10
+  min_line_length: 30
+  offset_threshold: 300
+  angle_threshold: 10
+}
+curb_config {
+  angle_threshold: 10
+  length_threshold: 60
+}

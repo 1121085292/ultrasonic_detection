@@ -5,7 +5,7 @@ module_config {
     class_name : "UltrasonicComponent"
     config {
       name: "UltrasonicComponent"
-      config_file_path :"../ultrasonic_detection/conf/ultrasonic_conf.pb.txt"
+      config_file_path :"../ultrasonic_detection/conf/UKE_ultrasonic_conf.pb.pb.txt"
       readers {
         channel: "can_data_list"
       },

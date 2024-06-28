@@ -73,5 +73,10 @@ class UltrasonicComponent : public Component<CanDataList, InsLocation> {
   size_t spot_id_ = 0;
   // 解析超声波雷达can数据
   std::shared_ptr<USSInterface> uss_interface_ptr_ = nullptr;
+
+  // debug
+  std::shared_ptr<apollo::cyber::Writer<uss::common_msgs::Point>>
+      point_writer_ = nullptr;
+  std::ofstream output_;
 };
 CYBER_REGISTER_COMPONENT(UltrasonicComponent);

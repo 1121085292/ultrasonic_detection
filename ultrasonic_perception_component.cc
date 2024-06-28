@@ -94,6 +94,8 @@ bool UltrasonicComponent::Init() {
 
   // 超声波雷达can解析器
   uss_interface_ptr_ = std::make_shared<USSInterface>();
+  point_writer_ = node_->CreateWriter<uss::common_msgs::Point>("point");
+  output_ = std::ofstream("ultrasonic_detection/position.txt");
   return true;
 }
 
@@ -113,23 +115,26 @@ bool UltrasonicComponent::Proc(
 
   // 提取每个探头的测距信息
   std::vector<int> distances(coordinate_map_.size() + 1, 0);
-  for (const auto &echo : echo_list.echo()) {
-    int sensor_id = echo.sensor_id();
-    echo_map_[sensor_id] = echo;
-    distances[sensor_id] = echo.distance();
-  }
-
   // 根据探头配置选择测距方式，实现探头定位
   std::map<int, Point2D> pos_map;  //  车身坐标系下的障碍物位置
   std::map<int, Point2D> global_pos_map;  //  全局坐标系下障碍物位置
   auto pose = std::make_shared<Pose>(location->pose());
-  for (int sensor_id = 1; sensor_id <= 12; ++sensor_id) {
+  ParkingSpot fsr_parking_spots;
+
+  for (const auto &echo : echo_list.echo()) {
+    int sensor_id = echo.sensor_id();
+    echo_map_[sensor_id] = echo;
+    auto distance = echo.distance();
+    distances[sensor_id] = echo.distance();
+
+    // for (int sensor_id = 1; sensor_id <= 12; ++sensor_id) {
     Point2D position;
     Point2D global_pos;
     // 直接测距定位
     // 根据探头ID和测距信息创建探头对象，包含了侧探头
-    auto ultra_ptr = std::make_shared<Ultrasonic>(coordinate_map_[sensor_id],
-                                                  distances[sensor_id]);
+    if (sensor_id != 6) continue;
+    auto ultra_ptr =
+        std::make_shared<Ultrasonic>(coordinate_map_[sensor_id], distance);
     // 直接测距定位
     ultra_ptr->DirectMeasuredPositionCalculate();
     position = ultra_ptr->GetPosition();
@@ -139,6 +144,20 @@ bool UltrasonicComponent::Proc(
     ultra_ptr->GlobalDirectPositionCalculate(pose);
     global_pos = ultra_ptr->GetGlobalPosition();
     global_pos_map[sensor_id] = global_pos;
+    if (sensor_id == 6) {
+      output_ << global_pos.x << " " << global_pos.y << "\n";
+      auto point_msg = std::make_shared<uss::common_msgs::Point>();
+      point_msg->set_x(global_pos.x);
+      point_msg->set_y(global_pos.y);
+      point_writer_->Write(point_msg);
+      parking_spot_detect_ptr_->ParkingSpotSearch(
+          global_pos, pose, line_fit_params_, parking_spot_params_,
+          curb_params_, fsr_parking_spots);
+      if (fsr_parking_spots.has_spot_type()) {
+        spots_[spot_id_] = fsr_parking_spots;
+        spot_id_++;
+      }
+    }
     // 三角测距定位目标,更新直接测距计算的位置
     if (use_triangle_measured_) {
       std::shared_ptr<UltrasonicDetection> ultra_detec_ptr;
@@ -185,29 +204,29 @@ bool UltrasonicComponent::Proc(
    * 存储10帧障碍物位置后，拟合边界线段，对满足要求的线段对进行生长再判断
    */
   // 车位
-  ParkingSpot fsl_parking_spots;
-  ParkingSpot fsr_parking_spots;
-  // TODO：Async？
-  for (const auto &pair : global_pos_map) {
-    if (pair.first == 1) {
-      parking_spot_detect_ptr_->ParkingSpotSearch(
-          pair.second, pose, line_fit_params_, parking_spot_params_,
-          curb_params_, fsl_parking_spots);
-      if (fsl_parking_spots.has_spot_type()) {
-        spots_[spot_id_] = fsl_parking_spots;
-        spot_id_++;
-      }
-    }
-    if (pair.first == 6) {
-      parking_spot_detect_ptr_->ParkingSpotSearch(
-          pair.second, pose, line_fit_params_, parking_spot_params_,
-          curb_params_, fsr_parking_spots);
-      if (fsr_parking_spots.has_spot_type()) {
-        spots_[spot_id_] = fsr_parking_spots;
-        spot_id_++;
-      }
-    }
-  }
+  // ParkingSpot fsl_parking_spots;
+  // ParkingSpot fsr_parking_spots;
+  // // TODO：Async？
+  // for (const auto &pair : global_pos_map) {
+  //   if (pair.first == 1) {
+  //     parking_spot_detect_ptr_->ParkingSpotSearch(
+  //         pair.second, pose, line_fit_params_, parking_spot_params_,
+  //         curb_params_, fsl_parking_spots);
+  //     if (fsl_parking_spots.has_spot_type()) {
+  //       spots_[spot_id_] = fsl_parking_spots;
+  //       spot_id_++;
+  //     }
+  //   }
+  //   if (pair.first == 6) {
+  //     parking_spot_detect_ptr_->ParkingSpotSearch(
+  //         pair.second, pose, line_fit_params_, parking_spot_params_,
+  //         curb_params_, fsr_parking_spots);
+  //     if (fsr_parking_spots.has_spot_type()) {
+  //       spots_[spot_id_] = fsr_parking_spots;
+  //       spot_id_++;
+  //     }
+  //   }
+  // }
   // 未找到空间车位
   if (spots_.empty()) {
     AINFO << "No parking Spots";
